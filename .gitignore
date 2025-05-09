@@ -1,0 +1,14 @@
+# --- GLOBAL ---
+.DS_Store
+*.log
+.env*
+node_modules/
+dist/
+.vscode/
+
+# --- NEXT.JS ---
+web_client/.next/
+web_client/out/
+web_client/coverage/
+web_client/.turbo/
+
