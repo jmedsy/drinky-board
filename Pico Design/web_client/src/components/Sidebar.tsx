@@ -1,24 +1,23 @@
 // import { Box, List, ListItemButton, ListItemText } from '@mui/material';
-import AbcIcon from '@mui/icons-material/Abc';
 import CheckIcon from '@mui/icons-material/Check';
-import FontDownloadIcon from '@mui/icons-material/FontDownload';
-import KeyboardIcon from '@mui/icons-material/Keyboard';
-import NumbersIcon from '@mui/icons-material/Numbers';
-import UsbIcon from '@mui/icons-material/Usb';
-import { Box } from '@mui/material';
-
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import InfoIcon from '@mui/icons-material/Info';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
+import PeopleIcon from '@mui/icons-material/People';
+import UsbIcon from '@mui/icons-material/Usb';
+import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-// import ListSubheader from '@mui/material/ListSubheader';
 import * as React from 'react';
+import SingleKeyDialog from './SingleKeyDialog';
 
 export default function NestedList() {
     const [open, setOpen] = React.useState(false);
+    const [singleKeyOpen, setSingleKeyOpen] = React.useState(false);
 
     const handleClick = () => {
         setOpen(!open);
@@ -37,6 +36,7 @@ export default function NestedList() {
                 borderColor: 'divider',
             }}
         >
+            <SingleKeyDialog open={singleKeyOpen} setOpen={setSingleKeyOpen} />
             <List>
                 <ListItemButton>
                     <ListItemIcon>
@@ -59,32 +59,44 @@ export default function NestedList() {
                 </ListItemButton>
                 <Collapse in={open} timeout={0} unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
+                        <ListItemButton onClick={() => setSingleKeyOpen(true)} sx={{ pl: 4 }}>
+                            {/* <ListItemIcon >
                                 <FontDownloadIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Key A" />
+                            </ListItemIcon> */}
+                            <ListItemText primary="Single Key" />
                         </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
+                            {/* <ListItemIcon>
                                 <AbcIcon />
-                            </ListItemIcon>
+                            </ListItemIcon> */}
                             <ListItemText primary="Alphabet" />
                         </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
+                            {/* <ListItemIcon>
                                 <NumbersIcon />
-                            </ListItemIcon>
+                            </ListItemIcon> */}
                             <ListItemText primary="Keyboard Digits" />
                         </ListItemButton>
                         <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
+                            {/* <ListItemIcon>
                                 <NumbersIcon />
-                            </ListItemIcon>
+                            </ListItemIcon> */}
                             <ListItemText primary="Numpad Digits" />
                         </ListItemButton>
                     </List>
                 </Collapse>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <PeopleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Typing Profiles" />
+                </ListItemButton>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <InfoIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="About" />
+                </ListItemButton>
             </List>
         </Box>
     );
