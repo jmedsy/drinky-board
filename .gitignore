@@ -7,8 +7,8 @@ dist/
 .vscode/
 
 # --- NEXT.JS ---
-web_client/.next/
-web_client/out/
-web_client/coverage/
-web_client/.turbo/
+**/web_client/.next/
+**/web_client/out/
+**/web_client/coverage/
+**/web_client/.turbo/
 

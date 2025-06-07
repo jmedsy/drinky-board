@@ -1,4 +1,3 @@
-// import { Box, List, ListItemButton, ListItemText } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -13,11 +12,27 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import * as React from 'react';
+import DrinkySnackbar from './DrinkySnackbar';
 import SingleKeyDialog from './SingleKeyDialog';
+
+const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BASE_URL;
 
 export default function NestedList() {
     const [open, setOpen] = React.useState(false);
     const [singleKeyOpen, setSingleKeyOpen] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
+    const [openCC, setOpenCC] = React.useState(false);
+
+    const handleClickCC = async () => {
+        try {
+            const res = await fetch(`${flaskUrl}/hello`);
+            const data = await res.json();
+            setSnackbarMessage(data.message);
+        } catch (err) {
+            console.error('API call failed:', err);
+        }
+        setOpenCC(true)
+    }
 
     const handleClick = () => {
         setOpen(!open);
@@ -36,9 +51,8 @@ export default function NestedList() {
                 borderColor: 'divider',
             }}
         >
-            <SingleKeyDialog open={singleKeyOpen} setOpen={setSingleKeyOpen} />
             <List>
-                <ListItemButton>
+                <ListItemButton onClick={() => handleClickCC()}>
                     <ListItemIcon>
                         <UsbIcon />
                     </ListItemIcon>
@@ -98,6 +112,9 @@ export default function NestedList() {
                     <ListItemText primary="About" />
                 </ListItemButton>
             </List>
+
+            <DrinkySnackbar open={openCC} setOpen={setOpenCC} message={snackbarMessage} />
+            <SingleKeyDialog open={singleKeyOpen} setOpen={setSingleKeyOpen} />
         </Box>
     );
 }
