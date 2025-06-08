@@ -5,6 +5,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import PeopleIcon from '@mui/icons-material/People';
 import UsbIcon from '@mui/icons-material/Usb';
+import type { AlertColor } from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
@@ -22,11 +23,13 @@ export default function NestedList() {
     const [singleKeyOpen, setSingleKeyOpen] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
     const [openCC, setOpenCC] = React.useState(false);
+    const [ccSeverity, setCcSeverity] = React.useState<AlertColor>('success');
 
     const handleClickCC = async () => {
         try {
-            const res = await fetch(`${flaskUrl}/hello`);
+            const res = await fetch(`${flaskUrl}/find_pico_ports`);
             const data = await res.json();
+            setCcSeverity(data.success == true ? 'success' : 'error');
             setSnackbarMessage(data.message);
         } catch (err) {
             console.error('API call failed:', err);
@@ -113,7 +116,7 @@ export default function NestedList() {
                 </ListItemButton>
             </List>
 
-            <DrinkySnackbar open={openCC} setOpen={setOpenCC} message={snackbarMessage} />
+            <DrinkySnackbar open={openCC} setOpen={setOpenCC} severity={ccSeverity} message={snackbarMessage} />
             <SingleKeyDialog open={singleKeyOpen} setOpen={setSingleKeyOpen} />
         </Box>
     );

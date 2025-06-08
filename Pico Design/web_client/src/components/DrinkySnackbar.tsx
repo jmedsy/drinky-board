@@ -1,3 +1,4 @@
+import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import * as React from 'react';
@@ -6,6 +7,7 @@ interface DrinkySnackbarProps {
     open: boolean;
     setOpen: (value: boolean) => void;
     message: string;
+    severity: AlertColor;
 }
 
 export default function DrinkySnackbar(props: DrinkySnackbarProps) {
@@ -26,7 +28,7 @@ export default function DrinkySnackbar(props: DrinkySnackbarProps) {
             <Snackbar open={props.open} autoHideDuration={2000} onClose={handleClose}>
                 <Alert
                     onClose={handleClose}
-                    severity="success"
+                    severity={props.severity}
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
