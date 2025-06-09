@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from pico_device import PicoDevice
+from logic.pico_device import PicoDevice
 
 bp = Blueprint('find_pico_ports', __name__)
 
