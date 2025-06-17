@@ -1,5 +1,5 @@
-from enum import Enum, auto
+from enum import Enum
 
 class Axis(Enum):
-    X = auto()
-    Y = auto()
+    X = 0
+    Y = 1
