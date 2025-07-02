@@ -35,7 +35,7 @@ class ItsyBitsyDevice:
                         ItsyBitsyDevice.DEFAULT_BAUDRATE, 
                         timeout=ItsyBitsyDevice.DEFAULT_TIMEOUT
                     )
-                    time.sleep(2)  # Wait for device to reset
+                    # time.sleep(2)  # Wait for device to reset
                     
                     # Try to read any initial output
                     if ser.in_waiting:

@@ -22,19 +22,31 @@ export default function NestedList() {
     const [open, setOpen] = React.useState(false);
     const [singleKeyOpen, setSingleKeyOpen] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
-    const [openCC, setOpenCC] = React.useState(false);
-    const [ccSeverity, setCcSeverity] = React.useState<AlertColor>('success');
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = React.useState<AlertColor>('success');
 
     const handleClickCC = async () => {
         try {
             const res = await fetch(`${flaskUrl}/find_itsybitsy_ports`);
             const data = await res.json();
-            setCcSeverity(data.success == true ? 'success' : 'error');
+            setSnackbarSeverity(data.success == true ? 'success' : 'error');
             setSnackbarMessage(data.message);
         } catch (err) {
             console.error('API call failed:', err);
         }
-        setOpenCC(true)
+        setOpenSnackbar(true)
+    }
+
+    const handleClickAlphabet = async () => {
+        try {
+            const res = await fetch(`${flaskUrl}/outputTests/alphabet`);
+            const data = await res.json();
+            setSnackbarSeverity(data.success == true ? 'success' : 'error');
+            setSnackbarMessage(data.message);
+        } catch (err) {
+            console.error('API call failed:', err);
+        }
+        setOpenSnackbar(true)
     }
 
     const handleClick = () => {
@@ -82,7 +94,7 @@ export default function NestedList() {
                             </ListItemIcon> */}
                             <ListItemText primary="Single Key" />
                         </ListItemButton>
-                        <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemButton onClick={() => handleClickAlphabet()} sx={{ pl: 4 }}>
                             {/* <ListItemIcon>
                                 <AbcIcon />
                             </ListItemIcon> */}
@@ -116,7 +128,7 @@ export default function NestedList() {
                 </ListItemButton>
             </List>
 
-            <DrinkySnackbar open={openCC} setOpen={setOpenCC} severity={ccSeverity} message={snackbarMessage} />
+            <DrinkySnackbar open={openSnackbar} setOpen={setOpenSnackbar} severity={snackbarSeverity} message={snackbarMessage} />
             <SingleKeyDialog open={singleKeyOpen} setOpen={setSingleKeyOpen} />
         </Box>
     );
