@@ -213,7 +213,7 @@ class KEYS:
     )
     ENTER = Mapping(
         row=Pin(i2c_addr=ROW_I2C_ADDR, logi_pin=17, pin=ADG2128Pin(Axis.X, 10)),
-        col=Pin(i2c_addr=COL_I2C_ADDR, logi_pin=8, pin=ADG2128Pin(Axis.Y, 1))
+        col=Pin(i2c_addr=COL_I2C_ADDR, logi_pin=13, pin=ADG2128Pin(Axis.Y, 6))
     )
     Y = Mapping(
         row=Pin(i2c_addr=ROW_I2C_ADDR, logi_pin=17, pin=ADG2128Pin(Axis.X, 10)),
