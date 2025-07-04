@@ -1,4 +1,4 @@
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/sidebar/Sidebar";
 import WatermarkBlock from "@/components/WatermarkBlock";
 import MUIProvider from "@/theme/MUIProvider";
 import { Box } from "@mui/material";
