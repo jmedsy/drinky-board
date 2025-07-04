@@ -1,3 +1,4 @@
+import { useGlobalKeyListener } from '@/hooks/useGlobalKeyListener';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import Backdrop from '@mui/material/Backdrop';
@@ -30,16 +31,29 @@ export default function SidebarDIButton() {
     const [backdropOpen, setBackdropOpen] = React.useState(false);
     const [openDialog, setOpenDialog] = React.useState(false);
 
+    useGlobalKeyListener((e) => {
+        if (backdropOpen) {
+            // // You can conditionally prevent default browser behavior
+            // if (e.ctrlKey || e.metaKey) {
+            //     e.preventDefault();
+            // }
+
+            e.preventDefault()
+
+            const keyDesc = `${e.ctrlKey ? 'Ctrl+' : ''}${e.altKey ? 'Alt+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.metaKey ? 'Meta+' : ''}${e.key}`;
+            window.alert(keyDesc);
+            // setLog((prev) => [...prev.slice(-9), keyDesc]);
+        }
+    });
+
     // Use a ref to persist state across re-mounts
     const backdropRef = React.useRef(false);
-
     // Initialize state from ref on mount
     React.useEffect(() => {
         if (backdropRef.current) {
             setBackdropOpen(true);
         }
     }, []);
-
     // Update ref when state changes
     React.useEffect(() => {
         backdropRef.current = backdropOpen;
