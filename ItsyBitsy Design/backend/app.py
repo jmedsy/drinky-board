@@ -1,27 +1,31 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
-from routes import find_itsybitsy_ports
-from routes.outputTests import output_tests_bp
 import threading
 import queue
 import signal
 import atexit
 import time
+from logic.itsybitsy_device import ItsyBitsyDevice
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=['http://localhost:3000'])
 
-# Register blueprints
-app.register_blueprint(find_itsybitsy_ports.bp)
-app.register_blueprint(output_tests_bp)
+# Global variable for the ItsyBitsy device
+itsy_device = None
 
 #region Drinky Board manager
 ##########################################################
-
 command_queue = queue.Queue()
 stop_event = threading.Event()
 
 def drinky_manager():
+    global itsy_device
+    devices = ItsyBitsyDevice.find_devices()
+    if devices:
+        itsy_device = devices[0]
+        for unused in devices[1:]:
+            unused.close()
+
     while not stop_event.is_set():
         try:
             cmd = command_queue.get(timeout=0.5)
@@ -29,8 +33,10 @@ def drinky_manager():
             continue
         # Process command...
         time.sleep(0.2)
-    # 🔄 Cleanup logic here
-    print("Worker doing cleanup before exit")
+
+    # Cleanup logic
+    if itsy_device:
+        itsy_device.close()
 
 def start_drinky_manager():
     thread = threading.Thread(target=drinky_manager, daemon=True)
@@ -39,17 +45,17 @@ def start_drinky_manager():
 
 def stop_drinky_manager():
     stop_event.set()
-    print("Stopping Drinky Board manager...")
+    print('Stopping Drinky Board manager...')
 
 def drinky_shutdown_handler(signum, frame):
-    print(f"\nReceived signal {signum}, shutting down...")
+    print(f'\nReceived signal {signum}, shutting down...')
     stop_drinky_manager()
     # Force exit after a short delay to allow cleanup
     import os
     # import threading
     def force_exit():
         time.sleep(1)
-        print("Force exiting...")
+        print('Force exiting...')
         os._exit(0)  # Force immediate exit
     threading.Thread(target=force_exit, daemon=True).start()
 
@@ -58,7 +64,14 @@ signal.signal(signal.SIGINT, drinky_shutdown_handler)
 signal.signal(signal.SIGTERM, drinky_shutdown_handler)
 
 drinky_manager_thread = start_drinky_manager()
-print("Drinky Board manager started")
-
+print('Drinky Board manager started')
 ##########################################################
 #endregion
+
+# Import routes after global variables are defined to avoid circular imports
+from routes import find_itsybitsy_ports
+from routes.outputTests import output_tests_bp
+
+# Register blueprints
+app.register_blueprint(find_itsybitsy_ports.bp)
+app.register_blueprint(output_tests_bp)

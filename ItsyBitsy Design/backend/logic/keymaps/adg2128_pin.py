@@ -17,6 +17,6 @@ BUS_PIN_X = ADG2128Pin(Axis.X, 6)
 BUS_PIN_Y = ADG2128Pin(Axis.Y, 7)
 
 def get_bus_pin(pin: ADG2128Pin) -> ADG2128Pin:
-    """Returns the appropriate bus pin based on the given pin's axis.
-    If the pin is on the Y axis, it needs the X bus pin, and vice versa."""
+    '''Returns the appropriate bus pin based on the given pin's axis.
+    If the pin is on the Y axis, it needs the X bus pin, and vice versa.'''
     return BUS_PIN_X if pin.axis == Axis.Y else BUS_PIN_Y

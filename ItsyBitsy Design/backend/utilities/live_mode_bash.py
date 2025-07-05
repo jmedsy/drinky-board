@@ -21,14 +21,14 @@ eligible_modifiers = {keyboard.Key.shift, keyboard.Key.shift_r, keyboard.Key.cmd
 
 #region Helper Functions
 def find_itsybitsy_port():
-    """Find the ItsyBitsy port by searching for USB ports"""
+    '''Find the ItsyBitsy port by searching for USB ports'''
     ports = glob.glob('/dev/tty.usbmodem*')
     if not ports:
-        raise Exception("No ItsyBitsy found. Please connect the device.")
+        raise Exception('No ItsyBitsy found. Please connect the device.')
     return ports[0]
 
 def send_command(key, action):
-    """Send a command to the Arduino"""
+    '''Send a command to the Arduino'''
     command = struct.pack('>BBBBBBBBBBBBB',
         key.row.i2c_addr,
         key.row.logi_pin,
@@ -42,7 +42,7 @@ def send_command(key, action):
         key.col.pin.channel,
         key.col.bus_pin.axis.value,
         key.col.bus_pin.channel,
-        1 if action == "PRESS" else 0
+        1 if action == 'PRESS' else 0
     )
     ser.write(command)
     ser.flush()
@@ -108,17 +108,17 @@ def main():
     global ser
     # Find and open serial port
     port = find_itsybitsy_port()
-    print(f"Found ItsyBitsy at {port}")
+    print(f'Found ItsyBitsy at {port}')
     
     # Open serial port
     ser = serial.Serial(port, 115200, timeout=0.001)
-    print("Serial port opened successfully")
+    print('Serial port opened successfully')
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
 
     # Cleanup
     ser.close()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main() 
 #endregion
