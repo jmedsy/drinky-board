@@ -8,7 +8,7 @@ import struct
 import serial
 import glob
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from logic.keymaps.physical_map import KEYS
+from logic.keymaps.key_definitions import KEYS
 from logic.keygroup.keygroup import KeyGroup, get_keymap_name
 #endregion
 

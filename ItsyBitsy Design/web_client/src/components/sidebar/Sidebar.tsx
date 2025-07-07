@@ -10,8 +10,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import * as React from 'react';
+import ConnectionStatus from './ConnectionStatus';
 import SidebarButton from './SidebarButton';
-import SidebarCDButton from './SidebarCDButton';
 import SidebarDIButton from './SidebarDIButton';
 import SidebarTestAlphaButton from './SidebarTestAlphaButton';
 
@@ -35,7 +35,7 @@ export default function NestedList() {
             }}
         >
             <List>
-                <SidebarCDButton />
+                <ConnectionStatus />
                 <SidebarDIButton />
                 <ListItemButton onClick={() => toggleTests()}>
                     <ListItemIcon>

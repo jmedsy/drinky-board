@@ -13,7 +13,7 @@ export default function SidebarTestAlphaButton() {
 
     const handleClickAlphabet = async () => {
         try {
-            const res = await fetch(`${flaskUrl}/outputTests/alphabet`);
+            const res = await fetch(`${flaskUrl}/output_tests/alphabet`);
             const data = await res.json();
             setSnackbarSeverity(data.success == true ? 'success' : 'error');
             setSnackbarMessage(data.message);

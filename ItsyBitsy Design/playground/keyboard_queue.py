@@ -9,7 +9,7 @@ from time import sleep
 import struct
 import serial
 import glob
-from backend.logic.keymaps.physical_map import KEYS
+from backend.logic.keymaps.key_definitions import KEYS
 from backend.logic.keygroup.keygroup import KeyGroup, get_keymap_name
 #endregio
 

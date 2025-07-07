@@ -1,14 +1,14 @@
 from flask import Blueprint, jsonify
-from logic.keymaps.physical_map import KEYS
+from logic.keymaps.key_definitions import KEYS
 from time import sleep
 
-output_tests_bp = Blueprint('output_tests', __name__, url_prefix='/outputTests')
+bp = Blueprint('output_tests', __name__, url_prefix='/output_tests')
 
 def get_itsy_device():
     import app
     return app.itsy_device
 
-@output_tests_bp.route('/alphabet')
+@bp.route('/alphabet')
 def output_tests():
     try:
         itsy_device = get_itsy_device()

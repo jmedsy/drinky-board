@@ -1,14 +1,34 @@
 // hooks/useGlobalKeyListener.ts
 import { useEffect } from 'react';
 
-export function useGlobalKeyListener(callback: (event: KeyboardEvent) => void) {
+export function useGlobalKeyListener(
+    onKeyDown?: (event: KeyboardEvent) => void,
+    onKeyUp?: (event: KeyboardEvent) => void
+) {
     useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            callback(e);
+        const keyDownHandler = (e: KeyboardEvent) => {
+            onKeyDown?.(e);
         };
-        window.addEventListener('keydown', handler);
+
+        const keyUpHandler = (e: KeyboardEvent) => {
+            onKeyUp?.(e);
+        };
+
+        if (onKeyDown) {
+            window.addEventListener('keydown', keyDownHandler);
+        }
+
+        if (onKeyUp) {
+            window.addEventListener('keyup', keyUpHandler);
+        }
+
         return () => {
-            window.removeEventListener('keydown', handler);
+            if (onKeyDown) {
+                window.removeEventListener('keydown', keyDownHandler);
+            }
+            if (onKeyUp) {
+                window.removeEventListener('keyup', keyUpHandler);
+            }
         };
-    }, [callback]);
+    }, [onKeyDown, onKeyUp]);
 }

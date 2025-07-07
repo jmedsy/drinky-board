@@ -6,7 +6,7 @@ import struct
 import time
 import glob
 from pynput import keyboard
-from backend.logic.keymaps.physical_map import KEYS
+from backend.logic.keymaps.key_definitions import KEYS
 
 def find_itsybitsy_port():
     """Find the ItsyBitsy port by searching for USB ports"""
