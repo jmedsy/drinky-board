@@ -11,6 +11,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import * as React from 'react';
 
+const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BASE_URL;
+
 interface TypingProfile {
     name: string;
     wpm: number;
@@ -61,6 +63,16 @@ export default function SidebarDIButton() {
         reader.readAsText(file);
     };
 
+    const testRoute = async () => {
+        try {
+            const res = await fetch(`${flaskUrl}/profiles/get_all`);
+            const data = await res.json();
+            console.log(data);
+        } catch (err) {
+            console.error('API call failed:', err);
+        }
+    }
+
     return (
         <>
             <ListItemButton onClick={handleButtonClick}>
@@ -73,12 +85,12 @@ export default function SidebarDIButton() {
             <Dialog
                 open={openDialog}
                 onClose={() => setOpenDialog(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-                maxWidth="md"
+                aria-labelledby='alert-dialog-title'
+                aria-describedby='alert-dialog-description'
+                maxWidth='md'
                 fullWidth
             >
-                <DialogTitle id="alert-dialog-title">
+                <DialogTitle id='alert-dialog-title'>
                     Typing Profiles
                 </DialogTitle>
                 <DialogContent>
@@ -86,7 +98,7 @@ export default function SidebarDIButton() {
                         <Box sx={{ flex: '0 0 30%' }}>
                             <Box sx={{ mt: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Button
-                                    variant="outlined"
+                                    variant='outlined'
                                     sx={{
                                         flex: 1,
                                         height: '100%',
@@ -109,13 +121,14 @@ export default function SidebarDIButton() {
                                             pointerEvents: 'none'
                                         }
                                     }}
+                                    onClick={() => testRoute()}
                                 >
                                     Add Profile
                                 </Button>
                             </Box>
                         </Box>
                         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                            <DialogContentText id="alert-dialog-description">
+                            <DialogContentText id='alert-dialog-description'>
                                 Create typing profiles for customizing things like <strong><em>average wpm</em></strong>, <strong><em>average key hold time</em></strong>, etc.
                             </DialogContentText>
                         </Box>
@@ -131,15 +144,15 @@ export default function SidebarDIButton() {
                         Import Profiles
                     </Button>
                     <input
-                        accept=".json"
+                        accept='.json'
                         style={{ display: 'none' }}
-                        id="load-profiles-button"
-                        type="file"
+                        id='load-profiles-button'
+                        type='file'
                         onChange={loadProfilesFromFile}
                     />
                     <Box sx={{ flex: 1 }} />
                     <Button onClick={() => setOpenDialog(false)}>Back</Button>
-                    <Button variant="contained" color="primary" disabled>
+                    <Button variant='contained' color='primary' disabled>
                         Save
                     </Button>
                 </DialogActions>
