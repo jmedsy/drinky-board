@@ -12,3 +12,6 @@ dist/
 **/web_client/out/
 **/web_client/coverage/
 **/web_client/.turbo/
+
+# --- BACKEND DATA ---
+**/backend/data/profiles/

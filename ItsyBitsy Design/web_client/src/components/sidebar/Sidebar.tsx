@@ -1,26 +1,26 @@
-import CheckIcon from '@mui/icons-material/Check';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+// import CheckIcon from '@mui/icons-material/Check';
+// import ExpandLess from '@mui/icons-material/ExpandLess';
+// import ExpandMore from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
-import PeopleIcon from '@mui/icons-material/People';
+// import PeopleIcon from '@mui/icons-material/People';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
+// import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import * as React from 'react';
+// import ListItemButton from '@mui/material/ListItemButton';
+// import ListItemIcon from '@mui/material/ListItemIcon';
+// import ListItemText from '@mui/material/ListItemText';
 import ConnectionStatus from './ConnectionStatus';
 import SidebarButton from './SidebarButton';
 import SidebarDIButton from './SidebarDIButton';
-import SidebarTestAlphaButton from './SidebarTestAlphaButton';
+import SidebarProfilesButton from './SidebarProfilesButton';
+// import SidebarTestAlphaButton from './SidebarTestAlphaButton';
 
 export default function NestedList() {
-    const [openTests, setOpenTests] = React.useState(false);
+    // const [openTests, setOpenTests] = React.useState(false);
 
-    const toggleTests = () => {
-        setOpenTests(!openTests);
-    }
+    // const toggleTests = () => {
+    //     setOpenTests(!openTests);
+    // }
 
     return (
         <Box
@@ -37,7 +37,7 @@ export default function NestedList() {
             <List>
                 <ConnectionStatus />
                 <SidebarDIButton />
-                <ListItemButton onClick={() => toggleTests()}>
+                {/* <ListItemButton onClick={() => toggleTests()}>
                     <ListItemIcon>
                         <CheckIcon />
                     </ListItemIcon>
@@ -48,8 +48,8 @@ export default function NestedList() {
                     <List component="div" disablePadding>
                         <SidebarTestAlphaButton />
                     </List>
-                </Collapse>
-                <SidebarButton icon={PeopleIcon} text='Typing Profiles' />
+                </Collapse> */}
+                <SidebarProfilesButton />
                 <SidebarButton icon={InfoIcon} text='About' />
             </List>
         </Box>
