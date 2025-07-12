@@ -199,7 +199,7 @@ export default function SidebarDIButton() {
                             color='error'
                             sx={{ animation: `${pulse} 1s infinite` }}
                         />
-                        <Typography variant="subtitle2" color="white">
+                        <Typography variant="subtitle2" color="white" sx={{ userSelect: 'none' }}>
                             Click anywhere to exit Direct Input mode
                         </Typography>
                     </Box>
