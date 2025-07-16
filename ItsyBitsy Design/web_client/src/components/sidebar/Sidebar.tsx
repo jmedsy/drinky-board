@@ -13,6 +13,7 @@ import ConnectionStatus from './ConnectionStatus';
 import SidebarButton from './SidebarButton';
 import SidebarDIButton from './SidebarDIButton';
 import SidebarProfilesButton from './SidebarProfilesButton';
+import SidebarSequencesButton from './SidebarSequencesButton';
 // import SidebarTestAlphaButton from './SidebarTestAlphaButton';
 
 export default function NestedList() {
@@ -50,6 +51,7 @@ export default function NestedList() {
                     </List>
                 </Collapse> */}
                 <SidebarProfilesButton />
+                <SidebarSequencesButton />
                 <SidebarButton icon={InfoIcon} text='About' />
             </List>
         </Box>
