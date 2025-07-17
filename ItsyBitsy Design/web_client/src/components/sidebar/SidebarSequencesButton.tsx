@@ -5,11 +5,15 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
@@ -51,10 +55,13 @@ export default function SidebarProfilesButton() {
         description: '',
         isActive: false
     });
+    const [selectedType, setSelectedType] = React.useState('Type Text');
+    const [sequenceActions, setSequenceActions] = React.useState<DraggableItem[]>([]);
 
     // Custom setter to prevent reordering
     const updateSequenceActions = React.useCallback((newActions: DraggableItem[]) => {
         console.log('updateSequenceActions called with:', newActions.map(item => `${item.type} (${item.id})`));
+        setSequenceActions(newActions);
     }, []);
 
     /* API function */
@@ -364,20 +371,104 @@ export default function SidebarProfilesButton() {
                                         disabled={!saveBtnEnabled}
                                     />
 
-                                    <DraggableList
-                                        onItemsChange={updateSequenceActions}
-                                        onAddItem={(type?: string) => {
-                                            const newAction: DraggableItem = {
-                                                id: Date.now().toString(),
-                                                type: type || 'New Action',
-                                                description: 'Click to edit'
-                                            };
-                                            console.log('Adding new action:', newAction);
-                                        }}
-                                        height="300px"
-                                        title=""
-                                        addItemText="+ Add Action"
-                                    />
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                            Sequence Actions
+                                        </Typography>
+
+                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                            <FormControl size="small" sx={{ minWidth: 150 }}>
+                                                <InputLabel>Action Type</InputLabel>
+                                                <Select
+                                                    value={selectedType}
+                                                    label="Action Type"
+                                                    onChange={(e) => setSelectedType(e.target.value)}
+                                                >
+                                                    {['Type Text', 'Delay', 'Keyboard Shortcut', 'Mouse Click', 'Wait'].map((type) => (
+                                                        <MenuItem key={type} value={type}>
+                                                            {type}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                onClick={() => {
+                                                    const newAction: DraggableItem = {
+                                                        id: Date.now().toString(),
+                                                        type: selectedType,
+                                                        description: 'Click to edit'
+                                                    };
+                                                    console.log('Adding new action:', newAction);
+                                                    setSequenceActions(prev => [...prev, newAction]);
+                                                }}
+                                            >
+                                                + Add Action
+                                            </Button>
+                                        </Box>
+
+                                        <DraggableList
+                                            items={sequenceActions}
+                                            onItemsChange={updateSequenceActions}
+                                            height="300px"
+                                            title=""
+                                            itemTemplate={(item, onRemove, isDragging) => (
+                                                <Paper
+                                                    sx={{
+                                                        p: 2,
+                                                        mb: 1,
+                                                        backgroundColor: isDragging ? '#f0f8ff' : '#ffffff',
+                                                        border: '1px solid #e0e0e0',
+                                                        borderRadius: 1,
+                                                        cursor: 'grab',
+                                                        '&:active': { cursor: 'grabbing' },
+                                                        '&:hover': isDragging ? {} : { backgroundColor: '#f8f9fa' },
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        transition: 'all 0.2s ease'
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+                                                        <Box sx={{
+                                                            width: 8,
+                                                            height: 8,
+                                                            borderRadius: '50%',
+                                                            backgroundColor: '#2196f3',
+                                                            flexShrink: 0
+                                                        }} />
+                                                        <Box sx={{ flex: 1 }}>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                                                                {item.type}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                                                                {item.description}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            onRemove();
+                                                        }}
+                                                        sx={{
+                                                            p: 1,
+                                                            color: '#666',
+                                                            '&:hover': {
+                                                                backgroundColor: '#ffebee',
+                                                                color: '#d32f2f'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Paper>
+                                            )}
+                                        />
+                                    </Box>
                                 </Box>
                             </Box>
                         </Box>

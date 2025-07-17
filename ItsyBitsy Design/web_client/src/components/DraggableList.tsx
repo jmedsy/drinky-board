@@ -1,6 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
@@ -10,7 +10,7 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
 export interface DraggableItem {
     id: string;
@@ -26,18 +26,31 @@ interface DraggableListProps {
     title?: string;
     addItemText?: string;
     actionTypes?: string[];
+    itemTemplate?: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
 }
 
 // Individual draggable item component
 function DraggableItemComponent({
     item,
     onRemove,
-    isDragging
+    isDragging,
+    itemTemplate
 }: {
     item: DraggableItem;
     onRemove: () => void;
     isDragging: boolean;
+    itemTemplate?: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
 }) {
+    // Use custom template if provided, otherwise use default
+    if (itemTemplate) {
+        return (
+            <div data-id={item.id}>
+                {itemTemplate(item, onRemove, isDragging)}
+            </div>
+        );
+    }
+
+    // Default template
     return (
         <Paper
             data-id={item.id}
@@ -91,8 +104,9 @@ export default function DraggableList({
     onAddItem,
     height = '300px',
     title = 'Items (drag to reorder)',
-    addItemText = '+ Add Item',
-    actionTypes = ['Type Text', 'Delay', 'Keyboard Shortcut', 'Type File']
+    // addItemText = '+ Add Item',
+    actionTypes = ['Type Text', 'Delay', 'Keyboard Shortcut', 'Type File'],
+    itemTemplate
 }: DraggableListProps) {
     const [items, setItems] = React.useState(initialItems || []);
     const [selectedType, setSelectedType] = React.useState(actionTypes[0]);
@@ -154,14 +168,14 @@ export default function DraggableList({
     };
 
     // Add item handler (if present)
-    const handleAddItem = (type?: string) => {
-        const newAction: DraggableItem = {
-            id: uuidv4(),
-            type: type || 'New Action',
-            description: 'Click to edit'
-        };
-        setItems([...items, newAction]);
-    };
+    // const handleAddItem = (type?: string) => {
+    //     const newAction: DraggableItem = {
+    //         id: uuidv4(),
+    //         type: type || 'New Action',
+    //         description: 'Click to edit'
+    //     };
+    //     setItems([...items, newAction]);
+    // };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -187,13 +201,13 @@ export default function DraggableList({
                             ))}
                         </Select>
                     </FormControl>
-                    <Button
+                    {/* <Button
                         variant="outlined"
                         size="small"
                         onClick={() => handleAddItem(selectedType)}
                     >
                         {addItemText}
-                    </Button>
+                    </Button> */}
                 </Box>
             )}
 
@@ -213,6 +227,7 @@ export default function DraggableList({
                             item={item}
                             onRemove={() => removeItem(item.id)}
                             isDragging={isDragging}
+                            itemTemplate={itemTemplate}
                         />
                     ))}
                 </div>
