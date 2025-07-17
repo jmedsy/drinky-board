@@ -1,16 +1,11 @@
-import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
-// import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
-// import { v4 as uuidv4 } from 'uuid';
 
 export interface DraggableItem {
     id: string;
@@ -26,7 +21,7 @@ interface DraggableListProps {
     title?: string;
     addItemText?: string;
     actionTypes?: string[];
-    itemTemplate?: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
+    itemTemplate: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
 }
 
 // Individual draggable item component
@@ -39,62 +34,12 @@ function DraggableItemComponent({
     item: DraggableItem;
     onRemove: () => void;
     isDragging: boolean;
-    itemTemplate?: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
+    itemTemplate: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
 }) {
-    // Use custom template if provided, otherwise use default
-    if (itemTemplate) {
-        return (
-            <div data-id={item.id}>
-                {itemTemplate(item, onRemove, isDragging)}
-            </div>
-        );
-    }
-
-    // Default template
     return (
-        <Paper
-            data-id={item.id}
-            sx={{
-                p: 1,
-                mb: 0.5,
-                backgroundColor: '#ffffff',
-                border: '1px solid #e8e8e8',
-                borderRadius: 1,
-                cursor: 'grab',
-                '&:active': { cursor: 'grabbing' },
-                '&:hover': isDragging ? {} : { backgroundColor: '#f5f5f5' },
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-            }}
-        >
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%'
-            }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {item.type}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {item.description}
-                    </Typography>
-                </Box>
-                <IconButton
-                    size="small"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onRemove();
-                    }}
-                    sx={{ p: 0.5 }}
-                >
-                    <DeleteIcon fontSize="small" />
-                </IconButton>
-            </Box>
-        </Paper>
+        <div data-id={item.id}>
+            {itemTemplate(item, onRemove, isDragging)}
+        </div>
     );
 }
 
@@ -104,7 +49,6 @@ export default function DraggableList({
     onAddItem,
     height = '300px',
     title = 'Items (drag to reorder)',
-    // addItemText = '+ Add Item',
     actionTypes = ['Type Text', 'Delay', 'Keyboard Shortcut', 'Type File'],
     itemTemplate
 }: DraggableListProps) {
@@ -167,16 +111,6 @@ export default function DraggableList({
         setItems(newItems);
     };
 
-    // Add item handler (if present)
-    // const handleAddItem = (type?: string) => {
-    //     const newAction: DraggableItem = {
-    //         id: uuidv4(),
-    //         type: type || 'New Action',
-    //         description: 'Click to edit'
-    //     };
-    //     setItems([...items, newAction]);
-    // };
-
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {title && (
@@ -201,13 +135,6 @@ export default function DraggableList({
                             ))}
                         </Select>
                     </FormControl>
-                    {/* <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleAddItem(selectedType)}
-                    >
-                        {addItemText}
-                    </Button> */}
                 </Box>
             )}
 
