@@ -5,15 +5,11 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
-import InputLabel from '@mui/material/InputLabel';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
-import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
@@ -55,12 +51,10 @@ export default function SidebarProfilesButton() {
         description: '',
         isActive: false
     });
-    const [selectedType, setSelectedType] = React.useState('Type Text');
     const [sequenceActions, setSequenceActions] = React.useState<DraggableItem[]>([]);
 
     // Custom setter to prevent reordering
     const updateSequenceActions = React.useCallback((newActions: DraggableItem[]) => {
-        console.log('updateSequenceActions called with:', newActions.map(item => `${item.type} (${item.id})`));
         setSequenceActions(newActions);
     }, []);
 
@@ -135,6 +129,9 @@ export default function SidebarProfilesButton() {
     const handleButtonClick = () => {
         refreshProfiles();
         setOpenDialog(true);
+
+        // Auto-populate the DraggableList with actual profiles
+        // We'll convert profiles to DraggableItems after the profiles are loaded
     }
 
     const handleAddNewClick = () => {
@@ -150,7 +147,9 @@ export default function SidebarProfilesButton() {
             description: '',
             isActive: false
         });
-    }
+        // Clear the sequence actions when adding new
+        setSequenceActions([]);
+    };
 
     const handleProfileSelect = (profile: Profile) => {
         setSelectedProfile(profile.filename);
@@ -161,7 +160,27 @@ export default function SidebarProfilesButton() {
             ...profile.data,
             description: profile.data.description || ''
         });
-    }
+
+        // Populate the DraggableList with actions based on the profile
+        const profileActions: DraggableItem[] = [
+            {
+                id: 'wpm-action',
+                type: 'Set WPM',
+                description: `${profile.data.wpm} ± ${profile.data.wpmVariation}`
+            },
+            {
+                id: 'key-duration-action',
+                type: 'Set Key Duration',
+                description: `${profile.data.keyDuration} ± ${profile.data.keyDurationVariation}ms`
+            },
+            {
+                id: 'profile-description-action',
+                type: 'Profile Description',
+                description: profile.data.description || 'No description'
+            }
+        ];
+        setSequenceActions(profileActions);
+    };
 
     const resetToInitialState = () => {
         setSelectedProfile(null);
@@ -177,6 +196,7 @@ export default function SidebarProfilesButton() {
             description: '',
             isActive: false
         });
+        // Don't clear sequence actions here - let them persist
     }
 
     const handleSaveBtnClick = async () => {
@@ -245,6 +265,14 @@ export default function SidebarProfilesButton() {
                 // Sort profiles alphabetically by name
                 profileList.sort((a: Profile, b: Profile) => a.data.name.localeCompare(b.data.name));
                 setProfiles(profileList);
+
+                // Convert profiles to DraggableItems for the list
+                const profileDraggableItems: DraggableItem[] = profileList.map((profile: Profile) => ({
+                    id: profile.filename,
+                    type: profile.data.name,
+                    description: `${profile.data.wpm}±${profile.data.wpmVariation} WPM, ${profile.data.keyDuration}±${profile.data.keyDurationVariation}ms`
+                }));
+                setSequenceActions(profileDraggableItems);
 
                 // Always reset to initial disabled state
                 resetToInitialState();
@@ -371,104 +399,71 @@ export default function SidebarProfilesButton() {
                                         disabled={!saveBtnEnabled}
                                     />
 
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                            Sequence Actions
-                                        </Typography>
+                                    <DraggableList
+                                        items={sequenceActions}
+                                        onItemsChange={updateSequenceActions}
+                                        height="300px"
+                                        title=""
+                                        itemTemplate={(item, onRemove, isDragging) => {
+                                            // Find the corresponding profile for this item
+                                            const profile = profiles.find(p => p.filename === item.id);
+                                            const isActive = profile?.data.isActive || false;
 
-                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                            <FormControl size="small" sx={{ minWidth: 150 }}>
-                                                <InputLabel>Action Type</InputLabel>
-                                                <Select
-                                                    value={selectedType}
-                                                    label="Action Type"
-                                                    onChange={(e) => setSelectedType(e.target.value)}
-                                                >
-                                                    {['Type Text', 'Delay', 'Keyboard Shortcut', 'Mouse Click', 'Wait'].map((type) => (
-                                                        <MenuItem key={type} value={type}>
-                                                            {type}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                            <Button
-                                                variant="outlined"
-                                                size="small"
-                                                onClick={() => {
-                                                    const newAction: DraggableItem = {
-                                                        id: Date.now().toString(),
-                                                        type: selectedType,
-                                                        description: 'Click to edit'
-                                                    };
-                                                    console.log('Adding new action:', newAction);
-                                                    setSequenceActions(prev => [...prev, newAction]);
-                                                }}
-                                            >
-                                                + Add Action
-                                            </Button>
-                                        </Box>
-
-                                        <DraggableList
-                                            items={sequenceActions}
-                                            onItemsChange={updateSequenceActions}
-                                            height="300px"
-                                            title=""
-                                            itemTemplate={(item, onRemove, isDragging) => (
+                                            return (
                                                 <Paper
                                                     sx={{
-                                                        p: 2,
+                                                        height: '60px',
                                                         mb: 1,
-                                                        backgroundColor: isDragging ? '#f0f8ff' : '#ffffff',
-                                                        border: '1px solid #e0e0e0',
+                                                        p: 2,
+                                                        backgroundColor: isDragging ? '#f0f8ff' : '#fefefe',
+                                                        border: '1px solid #e8e8e8',
                                                         borderRadius: 1,
                                                         cursor: 'grab',
                                                         '&:active': { cursor: 'grabbing' },
-                                                        '&:hover': isDragging ? {} : { backgroundColor: '#f8f9fa' },
+                                                        '&:hover': isDragging ? {} : { backgroundColor: '#f5f5f5' },
                                                         display: 'flex',
-                                                        alignItems: 'center',
+                                                        flexDirection: 'column',
                                                         justifyContent: 'space-between',
+                                                        position: 'relative',
+                                                        userSelect: 'none',
                                                         transition: 'all 0.2s ease'
                                                     }}
                                                 >
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
-                                                        <Box sx={{
-                                                            width: 8,
-                                                            height: 8,
-                                                            borderRadius: '50%',
-                                                            backgroundColor: '#2196f3',
-                                                            flexShrink: 0
-                                                        }} />
-                                                        <Box sx={{ flex: 1 }}>
-                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1976d2' }}>
-                                                                {item.type}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                                                                {item.description}
-                                                            </Typography>
-                                                        </Box>
+                                                    <Box sx={{
+                                                        position: 'absolute',
+                                                        top: 4,
+                                                        right: 4,
+                                                        display: 'flex',
+                                                        gap: 0.5
+                                                    }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{ p: 0.5 }}
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                onRemove();
+                                                            }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
                                                     </Box>
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            onRemove();
-                                                        }}
-                                                        sx={{
-                                                            p: 1,
-                                                            color: '#666',
-                                                            '&:hover': {
-                                                                backgroundColor: '#ffebee',
-                                                                color: '#d32f2f'
-                                                            }
-                                                        }}
-                                                    >
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '50%' }}>
+                                                            {item.type}
+                                                        </Typography>
+                                                        <Typography variant="caption" sx={{ color: isActive ? 'green' : 'gray', mr: 3 }}>
+                                                            {isActive ? 'Active' : 'Inactive'}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#666' }}>
+                                                        <span>WPM: {profile?.data.wpm}±{profile?.data.wpmVariation}</span>
+                                                        <span>Duration: {profile?.data.keyDuration}±{profile?.data.keyDurationVariation}ms</span>
+                                                    </Box>
                                                 </Paper>
-                                            )}
-                                        />
-                                    </Box>
+                                            );
+                                        }}
+                                    />
                                 </Box>
                             </Box>
                         </Box>

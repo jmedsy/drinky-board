@@ -1,8 +1,4 @@
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
@@ -16,11 +12,8 @@ export interface DraggableItem {
 interface DraggableListProps {
     items?: DraggableItem[];
     onItemsChange?: (items: DraggableItem[]) => void;
-    onAddItem?: (type?: string) => void;
     height?: string;
     title?: string;
-    addItemText?: string;
-    actionTypes?: string[];
     itemTemplate: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
 }
 
@@ -46,14 +39,11 @@ function DraggableItemComponent({
 export default function DraggableList({
     items: initialItems,
     onItemsChange,
-    onAddItem,
     height = '300px',
     title = 'Items (drag to reorder)',
-    actionTypes = ['Type Text', 'Delay', 'Keyboard Shortcut', 'Type File'],
     itemTemplate
 }: DraggableListProps) {
     const [items, setItems] = React.useState(initialItems || []);
-    const [selectedType, setSelectedType] = React.useState(actionTypes[0]);
     const [isDragging, setIsDragging] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const sortableRef = React.useRef<Sortable | null>(null);
@@ -117,25 +107,6 @@ export default function DraggableList({
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {title}
                 </Typography>
-            )}
-
-            {onAddItem && (
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <FormControl size="small" sx={{ minWidth: 150 }}>
-                        <InputLabel>Action Type</InputLabel>
-                        <Select
-                            value={selectedType}
-                            label="Action Type"
-                            onChange={(e) => setSelectedType(e.target.value)}
-                        >
-                            {actionTypes.map((type) => (
-                                <MenuItem key={type} value={type}>
-                                    {type}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
             )}
 
             <Box sx={{
