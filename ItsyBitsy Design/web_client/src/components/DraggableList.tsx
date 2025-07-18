@@ -2,19 +2,17 @@ import Box from '@mui/material/Box';
 import * as React from 'react';
 import Sortable from 'sortablejs';
 
-interface DraggableListProps<T> {
-    items: T[];
-    onReorder?: (items: T[]) => void;
+interface DraggableListProps {
+    items: React.ReactNode[];
+    onReorder?: (items: React.ReactNode[]) => void;
     height?: string;
-    itemTemplate: (item: T, index: number) => React.ReactNode;
 }
 
-export default function DraggableList<T>({
+export default function DraggableList({
     items,
     onReorder,
-    height = '300px',
-    itemTemplate
-}: DraggableListProps<T>) {
+    height = '300px'
+}: DraggableListProps) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const sortableRef = React.useRef<Sortable | null>(null);
 
@@ -64,7 +62,7 @@ export default function DraggableList<T>({
                 <div ref={containerRef}>
                     {items.map((item, index) => (
                         <div key={index} data-id={index}>
-                            {itemTemplate(item, index)}
+                            {item}
                         </div>
                     ))}
                 </div>
