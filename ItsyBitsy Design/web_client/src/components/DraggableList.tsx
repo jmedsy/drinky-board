@@ -4,31 +4,23 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
 
-export interface DraggableItem {
-    id: string;
-    type: string;
-    description: string;
-}
-
 interface DraggableListProps {
     height?: string;
-    title?: string;
 }
 
 // Individual draggable item component
 function DraggableItemComponent({
-    item,
+    children,
     isDragging
 }: {
-    item: DraggableItem;
+    children: React.ReactNode;
     isDragging: boolean;
 }) {
     return (
         <Paper
-            data-id={item.id}
             sx={{
-                p: 1,
-                mb: 0.5,
+                p: 2,
+                mb: 1,
                 backgroundColor: '#ffffff',
                 border: '1px solid #e8e8e8',
                 borderRadius: 1,
@@ -37,40 +29,44 @@ function DraggableItemComponent({
                 '&:hover': isDragging ? {} : { backgroundColor: '#f5f5f5' },
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1
+                justifyContent: 'center',
+                minHeight: '60px'
             }}
         >
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%'
-            }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {item.type}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {item.description}
-                    </Typography>
-                </Box>
-            </Box>
+            {children}
         </Paper>
     );
 }
 
 export default function DraggableList({
-    height = '300px',
-    title = 'Items (drag to reorder)'
+    height = '300px'
 }: DraggableListProps) {
-    // Hardcoded dummy data
-    const [items] = React.useState<DraggableItem[]>([
-        { id: '1', type: 'Type Text', description: 'Hello World' },
-        { id: '2', type: 'Delay', description: '500ms' },
-        { id: '3', type: 'Keyboard Shortcut', description: 'Ctrl+C' },
-        { id: '4', type: 'Type File', description: 'config.txt' },
-        { id: '5', type: 'Delay', description: '1000ms' },
-        { id: '6', type: 'Type Text', description: 'Goodbye' }
+    // Hardcoded dummy components
+    const [items] = React.useState<React.ReactNode[]>([
+        <Box key="1" sx={{ p: 2, backgroundColor: '#e3f2fd', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 1</Typography>
+            <Typography variant="body2">This is the first box</Typography>
+        </Box>,
+        <Box key="2" sx={{ p: 2, backgroundColor: '#f3e5f5', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 2</Typography>
+            <Typography variant="body2">This is the second box</Typography>
+        </Box>,
+        <Box key="3" sx={{ p: 2, backgroundColor: '#e8f5e8', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 3</Typography>
+            <Typography variant="body2">This is the third box</Typography>
+        </Box>,
+        <Box key="4" sx={{ p: 2, backgroundColor: '#fff3e0', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 4</Typography>
+            <Typography variant="body2">This is the fourth box</Typography>
+        </Box>,
+        <Box key="5" sx={{ p: 2, backgroundColor: '#fce4ec', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 5</Typography>
+            <Typography variant="body2">This is the fifth box</Typography>
+        </Box>,
+        <Box key="6" sx={{ p: 2, backgroundColor: '#e0f2f1', borderRadius: 1, textAlign: 'center' }}>
+            <Typography variant="h6">Box 6</Typography>
+            <Typography variant="body2">This is the sixth box</Typography>
+        </Box>
     ]);
 
     const [isDragging, setIsDragging] = React.useState(false);
@@ -106,12 +102,6 @@ export default function DraggableList({
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {title && (
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {title}
-                </Typography>
-            )}
-
             <Box sx={{
                 height,
                 overflowY: 'auto',
@@ -122,12 +112,13 @@ export default function DraggableList({
                 backgroundColor: '#fafafa'
             }}>
                 <div ref={containerRef}>
-                    {items.map((item) => (
+                    {items.map((item, index) => (
                         <DraggableItemComponent
-                            key={item.id}
-                            item={item}
+                            key={index}
                             isDragging={isDragging}
-                        />
+                        >
+                            {item}
+                        </DraggableItemComponent>
                     ))}
                 </div>
             </Box>
@@ -146,12 +137,6 @@ export default function DraggableList({
                     opacity: 1;
                     transform: rotate(2deg);
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                }
-                [data-id] {
-                    user-select: none;
-                    -webkit-user-select: none;
-                    -moz-user-select: none;
-                    -ms-user-select: none;
                 }
             `}</style>
         </Box>
