@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
 
 interface DraggableListProps {
     height?: string;
+    items: React.ReactNode[];
 }
 
 // Individual draggable item component
@@ -39,36 +39,9 @@ function DraggableItemComponent({
 }
 
 export default function DraggableList({
-    height = '300px'
+    height = '300px',
+    items
 }: DraggableListProps) {
-    // Hardcoded dummy components
-    const [items] = React.useState<React.ReactNode[]>([
-        <Box key="1" sx={{ p: 2, backgroundColor: '#e3f2fd', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 1</Typography>
-            <Typography variant="body2">This is the first box</Typography>
-        </Box>,
-        <Box key="2" sx={{ p: 2, backgroundColor: '#f3e5f5', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 2</Typography>
-            <Typography variant="body2">This is the second box</Typography>
-        </Box>,
-        <Box key="3" sx={{ p: 2, backgroundColor: '#e8f5e8', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 3</Typography>
-            <Typography variant="body2">This is the third box</Typography>
-        </Box>,
-        <Box key="4" sx={{ p: 2, backgroundColor: '#fff3e0', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 4</Typography>
-            <Typography variant="body2">This is the fourth box</Typography>
-        </Box>,
-        <Box key="5" sx={{ p: 2, backgroundColor: '#fce4ec', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 5</Typography>
-            <Typography variant="body2">This is the fifth box</Typography>
-        </Box>,
-        <Box key="6" sx={{ p: 2, backgroundColor: '#e0f2f1', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Box 6</Typography>
-            <Typography variant="body2">This is the sixth box</Typography>
-        </Box>
-    ]);
-
     const [isDragging, setIsDragging] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const sortableRef = React.useRef<Sortable | null>(null);
