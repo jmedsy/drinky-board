@@ -1,66 +1,22 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Sortable from 'sortablejs';
 
-export interface DraggableItem {
-    id: string;
-    type: string;
-    description: string;
-}
-
-interface DraggableListProps {
-    items?: DraggableItem[];
-    onItemsChange?: (items: DraggableItem[]) => void;
+interface DraggableListProps<T> {
+    items: T[];
+    onReorder?: (items: T[]) => void;
     height?: string;
-    title?: string;
-    itemTemplate: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
+    itemTemplate: (item: T, index: number) => React.ReactNode;
 }
 
-// Individual draggable item component
-function DraggableItemComponent({
-    item,
-    onRemove,
-    isDragging,
-    itemTemplate
-}: {
-    item: DraggableItem;
-    onRemove: () => void;
-    isDragging: boolean;
-    itemTemplate: (item: DraggableItem, onRemove: () => void, isDragging: boolean) => React.ReactNode;
-}) {
-    return (
-        <div data-id={item.id}>
-            {itemTemplate(item, onRemove, isDragging)}
-        </div>
-    );
-}
-
-export default function DraggableList({
-    items: initialItems,
-    onItemsChange,
+export default function DraggableList<T>({
+    items,
+    onReorder,
     height = '300px',
-    title = 'Items (drag to reorder)',
     itemTemplate
-}: DraggableListProps) {
-    const [items, setItems] = React.useState(initialItems || []);
-    const [isDragging, setIsDragging] = React.useState(false);
+}: DraggableListProps<T>) {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const sortableRef = React.useRef<Sortable | null>(null);
-
-    // Update internal state when props change
-    React.useEffect(() => {
-        if (initialItems) {
-            setItems(initialItems);
-        }
-    }, [initialItems]);
-
-    // Notify parent when items change
-    React.useEffect(() => {
-        if (onItemsChange) {
-            onItemsChange(items);
-        }
-    }, [items, onItemsChange]);
 
     // Initialize SortableJS
     React.useEffect(() => {
@@ -72,17 +28,15 @@ export default function DraggableList({
                 dragClass: 'sortable-drag',
                 onStart: (evt) => {
                     evt.item.style.visibility = 'hidden';
-                    setIsDragging(true);
                 },
                 onEnd: (evt) => {
                     evt.item.style.visibility = 'visible';
-                    setIsDragging(false);
                     const { oldIndex, newIndex } = evt;
-                    if (oldIndex !== newIndex && oldIndex !== undefined && newIndex !== undefined) {
+                    if (oldIndex !== newIndex && oldIndex !== undefined && newIndex !== undefined && onReorder) {
                         const newItems = [...items];
                         const [movedItem] = newItems.splice(oldIndex, 1);
                         newItems.splice(newIndex, 0, movedItem);
-                        setItems(newItems);
+                        onReorder(newItems);
                     }
                 }
             });
@@ -94,21 +48,10 @@ export default function DraggableList({
                 sortableRef.current = null;
             }
         };
-    }, [items]);
-
-    const removeItem = (id: string) => {
-        const newItems = items.filter(item => item.id !== id);
-        setItems(newItems);
-    };
+    }, [items, onReorder]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {title && (
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {title}
-                </Typography>
-            )}
-
             <Box sx={{
                 height,
                 overflowY: 'auto',
@@ -119,14 +62,10 @@ export default function DraggableList({
                 backgroundColor: '#fafafa'
             }}>
                 <div ref={containerRef}>
-                    {items.map((item) => (
-                        <DraggableItemComponent
-                            key={item.id}
-                            item={item}
-                            onRemove={() => removeItem(item.id)}
-                            isDragging={isDragging}
-                            itemTemplate={itemTemplate}
-                        />
+                    {items.map((item, index) => (
+                        <div key={index} data-id={index}>
+                            {itemTemplate(item, index)}
+                        </div>
                     ))}
                 </div>
             </Box>
