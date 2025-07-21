@@ -15,6 +15,7 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import DraggableList from '../DraggableList';
 
 const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BASE_URL;
 
@@ -262,6 +263,30 @@ export default function SidebarProfilesButton() {
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: '0 0 30%' }}>
                             <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
+                                <Paper
+                                    sx={{
+                                        height: '60px',
+                                        mb: 1,
+                                        backgroundColor: isAddNewSelected ? '#e3f2fd' : '#fefefe',
+                                        border: isAddNewSelected ? '1px solid #2196f3' : '1px solid #e8e8e8',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            backgroundColor: isAddNewSelected ? '#e3f2fd' : '#f5f5f5'
+                                        }
+                                    }}
+                                >
+                                    <Button
+                                        variant='text'
+                                        sx={{
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: 0
+                                        }}
+                                        onClick={() => handleAddNewClick()}
+                                    >
+                                        Add New
+                                    </Button>
+                                </Paper>
                                 <Box sx={{
                                     height: '400px',
                                     overflowY: 'auto',
@@ -270,77 +295,55 @@ export default function SidebarProfilesButton() {
                                     p: 1,
                                     backgroundColor: '#fafafa'
                                 }}>
-                                    {profiles.map((p, index) => (
-                                        <Paper
-                                            key={index}
-                                            sx={{
-                                                height: '60px',
-                                                mb: 1,
-                                                p: 2,
-                                                backgroundColor: selectedProfile === p.filename ? '#e3f2fd' : '#fefefe',
-                                                border: selectedProfile === p.filename ? '1px solid #2196f3' : '1px solid #e8e8e8',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                justifyContent: 'space-between',
-                                                position: 'relative',
-                                                cursor: 'pointer',
-                                                userSelect: 'none',
-                                                '&:hover': {
-                                                    backgroundColor: selectedProfile === p.filename ? '#e3f2fd' : '#f5f5f5'
-                                                }
-                                            }}
-                                            onClick={() => handleProfileSelect(p)}
-                                        >
-                                            <Box sx={{
-                                                position: 'absolute',
-                                                top: 4,
-                                                right: 4,
-                                                display: 'flex',
-                                                gap: 0.5
-                                            }}>
-                                                <IconButton size="small" sx={{ p: 0.5 }} onClick={() => deleteHandler(p.filename)}>
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '50%' }}>
-                                                    {p.data.name}
-                                                </Typography>
-                                                <Typography variant="caption" sx={{ color: p.data.isActive ? 'green' : 'gray', mr: 3 }}>
-                                                    {p.data.isActive ? 'Active' : 'Inactive'}
-                                                </Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#666' }}>
-                                                <span>WPM: {p.data.wpm}±{p.data.wpmVariation}</span>
-                                                <span>Duration: {p.data.keyDuration}±{p.data.keyDurationVariation}ms</span>
-                                            </Box>
-                                        </Paper>
-                                    ))}
-
-                                    <Paper
-                                        sx={{
-                                            height: '60px',
-                                            mb: 1,
-                                            backgroundColor: isAddNewSelected ? '#e3f2fd' : '#fefefe',
-                                            border: isAddNewSelected ? '1px solid #2196f3' : '1px solid #e8e8e8',
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                backgroundColor: isAddNewSelected ? '#e3f2fd' : '#f5f5f5'
-                                            }
-                                        }}
-                                    >
-                                        <Button
-                                            variant='text'
-                                            sx={{
-                                                width: '100%',
-                                                height: '100%',
-                                                borderRadius: 0
-                                            }}
-                                            onClick={() => handleAddNewClick()}
-                                        >
-                                            Add New
-                                        </Button>
-                                    </Paper>
+                                    <DraggableList
+                                        onReorder={(oldIdx, newIdx) => console.log(`moved item from ${oldIdx} to ${newIdx}`)}
+                                        items={profiles.map((p, index) => (
+                                            <Paper
+                                                key={index}
+                                                sx={{
+                                                    height: '60px',
+                                                    mb: 1,
+                                                    p: 2,
+                                                    backgroundColor: selectedProfile === p.filename ? '#e3f2fd' : '#fefefe',
+                                                    border: selectedProfile === p.filename ? '1px solid #2196f3' : '1px solid #e8e8e8',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    justifyContent: 'space-between',
+                                                    position: 'relative',
+                                                    cursor: 'pointer',
+                                                    userSelect: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: selectedProfile === p.filename ? '#e3f2fd' : '#f5f5f5'
+                                                    }
+                                                }}
+                                                onClick={() => handleProfileSelect(p)}
+                                            >
+                                                <Box sx={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    display: 'flex',
+                                                    gap: 0.5
+                                                }}>
+                                                    <IconButton size="small" sx={{ p: 0.5 }} onClick={() => deleteHandler(p.filename)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '50%' }}>
+                                                        {p.data.name}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: p.data.isActive ? 'green' : 'gray', mr: 3 }}>
+                                                        {p.data.isActive ? 'Active' : 'Inactive'}
+                                                    </Typography>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#666' }}>
+                                                    <span>WPM: {p.data.wpm}±{p.data.wpmVariation}</span>
+                                                    <span>Duration: {p.data.keyDuration}±{p.data.keyDurationVariation}ms</span>
+                                                </Box>
+                                            </Paper>
+                                        ))}
+                                    />
                                 </Box>
                             </Box>
                         </Box>
