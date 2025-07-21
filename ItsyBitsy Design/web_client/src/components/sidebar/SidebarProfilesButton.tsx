@@ -120,6 +120,19 @@ export default function SidebarProfilesButton() {
         return res;
     }
 
+    /* API function */
+    const updateProfileOrder = async (profilesArg: string[]) => {
+
+        const res = await fetch(`${flaskUrl}/preferences/update_profile_order`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(profilesArg)
+        });
+        return res;
+    }
+
     const handleButtonClick = () => {
         refreshProfiles();
         setOpenDialog(true);
@@ -230,8 +243,6 @@ export default function SidebarProfilesButton() {
                 throw new Error(data.message);
             } else {
                 const profileList = data.profiles.map((p: Profile) => p);
-                // Sort profiles alphabetically by name
-                profileList.sort((a: Profile, b: Profile) => a.data.name.localeCompare(b.data.name));
                 setProfiles(profileList);
 
                 // Always reset to initial disabled state
@@ -241,6 +252,13 @@ export default function SidebarProfilesButton() {
             console.error('API call failed:', err);
         }
     }
+
+    const handleReorder = (oldIndex: number, newIndex: number) => {
+        const oldProfiles = [...profiles];
+        const item = oldProfiles.splice(oldIndex, 1)[0];
+        oldProfiles.splice(newIndex, 0, item);
+        updateProfileOrder(oldProfiles.map(prof => prof.filename));
+    };
 
     return (
         <>
@@ -296,7 +314,7 @@ export default function SidebarProfilesButton() {
                                     backgroundColor: '#fafafa'
                                 }}>
                                     <DraggableList
-                                        onReorder={(oldIdx, newIdx) => console.log(`moved item from ${oldIdx} to ${newIdx}`)}
+                                        onReorder={handleReorder}
                                         items={profiles.map((p, index) => (
                                             <Paper
                                                 key={index}
