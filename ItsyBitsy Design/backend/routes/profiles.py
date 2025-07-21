@@ -100,6 +100,14 @@ def add():
         with open(file_path, 'w') as f:
             json.dump(profile_data, f, indent=2)
         
+        # Update profileOrder in preferences
+        from logic.preferences_manager import load_preferences, save_preferences
+        preferences = load_preferences()
+        profile_order = preferences.get('profileOrder', [])
+        profile_order.append(filename)
+        preferences['profileOrder'] = profile_order
+        save_preferences(preferences)
+        
         return jsonify({
             'message': 'Profile added successfully',
             'success': True,
@@ -134,6 +142,14 @@ def delete(filename):
         
         # Delete the file
         os.remove(file_path)
+        
+        from logic.preferences_manager import load_preferences, save_preferences
+        preferences = load_preferences()
+        profile_order = preferences.get('profileOrder', [])
+        if filename in profile_order:
+            profile_order.remove(filename)
+            preferences['profileOrder'] = profile_order
+            save_preferences(preferences)
         
         return jsonify({
             'message': 'Profile deleted successfully',

@@ -37,8 +37,8 @@ const ConnectionStatus: React.FC = () => {
     useEffect(() => {
         fetchStatus();
 
-        // Poll for status every 500ms
-        const interval = setInterval(fetchStatus, 500);
+        const pollInterval = Number(process.env.NEXT_PUBLIC_DRINKY_STATUS_POLL_MS) || 500;
+        const interval = setInterval(fetchStatus, pollInterval);
 
         return () => clearInterval(interval);
     }, []);

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Dev flags
+export NEXT_PUBLIC_DRINKY_STATUS_POLL_MS=${DRINKY_STATUS_POLL_MS:-500}
+
 # Exit on error
 set -e
 

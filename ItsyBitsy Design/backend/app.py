@@ -5,6 +5,9 @@ import signal
 import atexit
 import time
 from logic.itsybitsy_device import ItsyBitsyDevice
+import os
+
+VERBOSE = os.environ.get('DRINKY_VERBOSE', '1') == '1'
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])
@@ -33,7 +36,8 @@ def drinky_manager():
             
             # Connect to the first available device
             itsy_device = devices[0]
-            print(f'Connected to device on port {itsy_device.port}')
+            if VERBOSE:
+                print(f'Connected to device on port {itsy_device.port}')
             
             # Close any additional devices found
             for unused in devices[1:]:
@@ -68,7 +72,8 @@ def drinky_manager():
             # Scan for new devices if we don't have one
             if current_time - last_device_scan > device_scan_interval:
                 if not itsy_device:
-                    print('Scanning for devices...')
+                    if VERBOSE:
+                        print('Scanning for devices...')
                     find_and_connect_device()
                 last_device_scan = current_time
                 
@@ -97,7 +102,6 @@ def drinky_shutdown_handler(signum, frame):
     print(f'\nReceived signal {signum}, shutting down...')
     stop_drinky_manager()
     # Force exit after a short delay to allow cleanup
-    import os
     def force_exit():
         time.sleep(1)
         print('Force exiting...')

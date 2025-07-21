@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from app import VERBOSE
 
 bp = Blueprint('connection_status', __name__)
 
@@ -10,11 +11,13 @@ def get_itsy_device():
 def connection_status():
     itsy_device = get_itsy_device()
     
-    print(f'Connection status check - Device: {itsy_device}')
-    print(f'Device port: {itsy_device.port if itsy_device else "None"}')
+    if VERBOSE:
+        print(f'Connection status check - Device: {itsy_device}')
+        print(f'Device port: {itsy_device.port if itsy_device else "None"}')
     
     if not itsy_device:
-        print('No device found')
+        if VERBOSE:
+            print('No device found')
         return jsonify({
             'connected': False,
             'status': 'disconnected',
@@ -25,10 +28,12 @@ def connection_status():
     
     # Check if device is actually connected and responsive
     is_connected = itsy_device.is_connected()
-    print(f'Device on {itsy_device.port} - Connected: {is_connected}')
+    if VERBOSE:
+        print(f'Device on {itsy_device.port} - Connected: {is_connected}')
     
     if is_connected:
-        print('Returning connected status')
+        if VERBOSE:
+            print('Returning connected status')
         return jsonify({
             'connected': True,
             'status': 'connected',
