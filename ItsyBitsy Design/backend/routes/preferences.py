@@ -1,35 +1,7 @@
 from flask import Blueprint, jsonify, request
-import os
-import json
+from logic.preferences_manager import load_preferences, save_preferences, get_default_preferences
 
 bp = Blueprint('preferences', __name__, url_prefix='/preferences')
-
-# Path to the preferences file
-PREFERENCES_FILE = 'data/user_preferences.json'
-
-def load_preferences():
-    '''Load user preferences from file'''
-    if os.path.exists(PREFERENCES_FILE):
-        try:
-            with open(PREFERENCES_FILE, 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            return get_default_preferences()
-    return get_default_preferences()
-
-def save_preferences(preferences):
-    '''Save user preferences to file'''
-    # Ensure the data directory exists
-    os.makedirs(os.path.dirname(PREFERENCES_FILE), exist_ok=True)
-    
-    with open(PREFERENCES_FILE, 'w') as f:
-        json.dump(preferences, f, indent=2)
-
-def get_default_preferences():
-    '''Get default preferences structure'''
-    return {
-        'profileOrder': []
-    }
 
 @bp.route('/get', methods=['GET'])
 def get_preferences():

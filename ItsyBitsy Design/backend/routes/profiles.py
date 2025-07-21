@@ -3,6 +3,7 @@ import os
 import json
 import uuid
 from datetime import datetime
+from logic.preferences_manager import load_preferences
 
 bp = Blueprint('profiles', __name__, url_prefix='/profiles')
 
@@ -19,6 +20,10 @@ def get_all():
                 'success': False,
                 'profiles': []
             }), 404
+        
+        # Get saved profile order from preferences
+        preferences = load_preferences()
+        profile_order = preferences.get('profileOrder', [])
         
         # List all files in the profiles directory
         profile_files = []
@@ -37,6 +42,15 @@ def get_all():
                         'filename': filename,
                         'error': 'Invalid JSON'
                     })
+        
+        # Sort profiles according to saved order
+        if profile_order:
+            # Create a mapping of filename to index for sorting
+            order_map = {filename: index for index, filename in enumerate(profile_order)}
+            
+            # Sort profile_files based on the order map
+            # Files not in the order list will be placed at the end
+            profile_files.sort(key=lambda x: order_map.get(x['filename'], len(profile_order)))
         
         return jsonify({
             'message': 'Profiles loaded successfully',
