@@ -51,6 +51,7 @@ export default function SidebarProfilesButton() {
         description: '',
         isActive: false
     });
+    const [dialogKey, setDialogKey] = React.useState(0);
 
     /* API function */
     const postProfile = async () => {
@@ -244,8 +245,7 @@ export default function SidebarProfilesButton() {
             } else {
                 const profileList = data.profiles.map((p: Profile) => p);
                 setProfiles(profileList);
-
-                // Always reset to initial disabled state
+                setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
                 resetToInitialState();
             }
         } catch (err) {
@@ -253,11 +253,21 @@ export default function SidebarProfilesButton() {
         }
     }
 
-    const handleReorder = (oldIndex: number, newIndex: number) => {
+    const handleReorder = async (oldIndex: number, newIndex: number) => {
         const oldProfiles = [...profiles];
         const item = oldProfiles.splice(oldIndex, 1)[0];
         oldProfiles.splice(newIndex, 0, item);
-        updateProfileOrder(oldProfiles.map(prof => prof.filename));
+        const res = await updateProfileOrder(oldProfiles.map(prof => prof.filename));
+        const data = await res.json();
+
+        if (data.success) {
+            console.log(data);
+            setProfiles(oldProfiles);
+            setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
+            refreshProfiles(); // Redundant, but makes absolutely sure UI is in sync
+        } else {
+            console.error('Error handling list reorder');
+        }
     };
 
     return (
@@ -277,7 +287,7 @@ export default function SidebarProfilesButton() {
                 fullWidth
                 disableEscapeKeyDown
             >
-                <DialogContent>
+                <DialogContent key={dialogKey}>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: '0 0 30%' }}>
                             <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
