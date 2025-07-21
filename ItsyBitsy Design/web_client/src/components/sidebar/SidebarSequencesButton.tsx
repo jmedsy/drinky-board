@@ -74,8 +74,9 @@ export default function SidebarProfilesButton() {
                         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                             <Box sx={{ width: '100%', p: 2 }}>
                                 <DraggableList
-                                    height="300px"
+                                    // height="300px"
                                     items={sampleItems}
+                                    onReorder={(oldIdx, newIdx) => console.log(`moved item from ${oldIdx} to ${newIdx}`)}
                                 />
                             </Box>
                         </Box>
