@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import Box from '@mui/material/Box';
@@ -5,13 +6,12 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
-import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
@@ -41,7 +41,6 @@ export default function SidebarSequencesButton() {
     const [sequences, setSequences] = React.useState<Sequence[]>([]);
     const [selectedSequence, setSelectedSequence] = React.useState<string | null>(null);
     const [isAddNewSelected, setIsAddNewSelected] = React.useState(false);
-    const [wasOriginallyActive, setWasOriginallyActive] = React.useState(false);
     const [formData, setFormData] = React.useState({
         name: '',
         wpm: 60,
@@ -52,6 +51,18 @@ export default function SidebarSequencesButton() {
         isActive: false
     });
     const [dialogKey, setDialogKey] = React.useState(0);
+    const [newAction, setNewAction] = React.useState<{
+        type: string;
+        duration?: string;
+        key?: string;
+        text?: string;
+        modifiers?: string[];
+    }>({ type: '' });
+
+    const modifierOptions = ['Ctrl', 'Shift', 'Alt', 'Meta'];
+    const keyOptions = [
+        'A', 'B', 'C', '1', '2', '3', 'Enter', 'Space', 'Tab', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
+    ];
 
     /* API function */
     const postSequence = async () => {
@@ -158,7 +169,6 @@ export default function SidebarSequencesButton() {
         setSelectedSequence(sequence.filename);
         setSaveBtnEnabled(true);
         setIsAddNewSelected(false);
-        setWasOriginallyActive(sequence.data.isActive);
         setFormData({
             ...sequence.data,
             description: sequence.data.description || ''
@@ -169,7 +179,6 @@ export default function SidebarSequencesButton() {
         setSelectedSequence(null);
         setIsAddNewSelected(false);
         setSaveBtnEnabled(false);
-        setWasOriginallyActive(false);
         setFormData({
             name: '',
             wpm: 60,
@@ -395,45 +404,105 @@ export default function SidebarSequencesButton() {
                                         size="small"
                                         disabled={!saveBtnEnabled}
                                     />
-                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                                         <TextField
-                                            label="WPM"
-                                            type="number"
-                                            value={formData.wpm}
-                                            onChange={(e) => setFormData({ ...formData, wpm: Number(e.target.value) })}
+                                            select
+                                            label="Action"
+                                            value={newAction.type}
+                                            onChange={e => setNewAction({ ...newAction, type: e.target.value })}
                                             size="small"
-                                            sx={{ flex: 1 }}
+                                            sx={{ minWidth: 110 }}
                                             disabled={!saveBtnEnabled}
-                                        />
-                                        <TextField
-                                            label="WPM Variation"
-                                            type="number"
-                                            value={formData.wpmVariation}
-                                            onChange={(e) => setFormData({ ...formData, wpmVariation: Number(e.target.value) })}
+                                        >
+                                            <MenuItem value=""><em>None</em></MenuItem>
+                                            <MenuItem value="delay">Delay</MenuItem>
+                                            <MenuItem value="keypress">Keypress</MenuItem>
+                                            <MenuItem value="text">Text</MenuItem>
+                                        </TextField>
+                                        {newAction?.type === 'delay' && (
+                                            <TextField
+                                                label="Duration (ms)"
+                                                type="number"
+                                                value={newAction.duration || ''}
+                                                onChange={e => setNewAction({ ...newAction, duration: e.target.value })}
+                                                size="small"
+                                                sx={{ minWidth: 80 }}
+                                            />
+                                        )}
+                                        {newAction?.type === 'keypress' && (
+                                            <>
+                                                <TextField
+                                                    select
+                                                    label="Key"
+                                                    value={newAction.key || ''}
+                                                    onChange={e => setNewAction({ ...newAction, key: e.target.value })}
+                                                    size="small"
+                                                    sx={{ minWidth: 80 }}
+                                                    disabled={!saveBtnEnabled}
+                                                >
+                                                    <MenuItem value=""><em>None</em></MenuItem>
+                                                    {keyOptions.map(opt => (
+                                                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                                                    ))}
+                                                </TextField>
+                                                {[0, 1, 2].map((idx) => (
+                                                    <TextField
+                                                        key={idx}
+                                                        select
+                                                        label={`Mod ${idx + 1}`}
+                                                        value={newAction.modifiers?.[idx] || ''}
+                                                        onChange={e => {
+                                                            const value = e.target.value;
+                                                            let newModifiers = (newAction.modifiers || []).slice();
+                                                            newModifiers[idx] = value;
+                                                            // Remove duplicates
+                                                            newModifiers = newModifiers.filter((mod, i, arr) => mod && arr.indexOf(mod) === i);
+                                                            setNewAction({ ...newAction, modifiers: newModifiers });
+                                                        }}
+                                                        size="small"
+                                                        sx={{ minWidth: 90 }}
+                                                        disabled={!saveBtnEnabled}
+                                                    >
+                                                        <MenuItem value=""><em>None</em></MenuItem>
+                                                        {modifierOptions.filter(opt => !(newAction.modifiers || []).includes(opt) || (newAction.modifiers?.[idx] === opt)).map(opt => (
+                                                            <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                                                        ))}
+                                                    </TextField>
+                                                ))}
+                                            </>
+                                        )}
+                                        {newAction?.type === 'text' && (
+                                            <TextField
+                                                label="Text"
+                                                value={newAction.text || ''}
+                                                onChange={e => setNewAction({ ...newAction, text: e.target.value })}
+                                                size="small"
+                                                sx={{ minWidth: 80 }}
+                                            />
+                                        )}
+                                        <IconButton
                                             size="small"
-                                            sx={{ flex: 1 }}
-                                            disabled={!saveBtnEnabled}
-                                        />
+                                            color="primary"
+                                            disabled={!newAction?.type}
+                                            onClick={() => {
+                                                // Dummy add action logic
+                                                setNewAction({ type: '' });
+                                            }}
+                                            aria-label="Add Action"
+                                            sx={{ alignSelf: 'center', mt: '7px' }}
+                                        >
+                                            <AddIcon />
+                                        </IconButton>
                                     </Box>
-                                    <Box sx={{ display: 'flex', gap: 2 }}>
-                                        <TextField
-                                            label="Key Duration (ms)"
-                                            type="number"
-                                            value={formData.keyDuration}
-                                            onChange={(e) => setFormData({ ...formData, keyDuration: Number(e.target.value) })}
-                                            size="small"
-                                            sx={{ flex: 1 }}
-                                            disabled={!saveBtnEnabled}
-                                        />
-                                        <TextField
-                                            label="Duration Variation (ms)"
-                                            type="number"
-                                            value={formData.keyDurationVariation}
-                                            onChange={(e) => setFormData({ ...formData, keyDurationVariation: Number(e.target.value) })}
-                                            size="small"
-                                            sx={{ flex: 1 }}
-                                            disabled={!saveBtnEnabled}
-                                        />
+                                    {/* You can add more fields or controls here as needed */}
+                                    <Box sx={{
+                                        height: '200px',
+                                        overflowY: 'auto',
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: 1,
+                                        p: 1,
+                                        backgroundColor: '#fafafa'
+                                    }}>
                                     </Box>
                                     <TextField
                                         label="Description (optional)"
@@ -443,19 +512,7 @@ export default function SidebarSequencesButton() {
                                         multiline
                                         rows={2}
                                         disabled={!saveBtnEnabled}
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={formData.isActive}
-                                                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                                disabled={!saveBtnEnabled || wasOriginallyActive}
-                                                sx={{
-                                                    visibility: selectedSequence && wasOriginallyActive ? 'hidden' : 'visible'
-                                                }}
-                                            />
-                                        }
-                                        label={selectedSequence && wasOriginallyActive ? "" : "Active"}
+                                        sx={{ mt: 2 }}
                                     />
                                 </Box>
                             </Box>
