@@ -77,7 +77,8 @@ const ConnectionStatus: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             borderBottom: 1,
-            borderColor: 'divider'
+            borderColor: 'divider',
+            userSelect: 'none',
         }}>
             <ListItemButton
                 disabled
@@ -89,7 +90,8 @@ const ConnectionStatus: React.FC = () => {
                     '&.Mui-disabled': {
                         opacity: 1,
                         color: 'inherit'
-                    }
+                    },
+                    userSelect: 'none',
                 }}
             >
                 <ListItemIcon>

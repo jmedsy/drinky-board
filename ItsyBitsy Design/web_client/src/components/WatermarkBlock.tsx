@@ -32,20 +32,23 @@ export default function WatermarkBlock() {
                 overflow: "visible",
                 zIndex: -1,
                 pointerEvents: "none", // Optional: lets clicks pass through
+                userSelect: 'none',
             }}
         >
             {/* Safe padding to shift everything right */}
-            <Box sx={{ pl: 5 }}>
+            <Box sx={{ pl: 5, userSelect: 'none' }}>
                 <Box
                     sx={{
                         width: "fit-content",
                         transform: `scale(${scale})`,
                         transformOrigin: "top left",
+                        userSelect: 'none',
                     }}
                 >
                     <Box
                         sx={{
                             width: `${BASE_WIDTH}px`,
+                            userSelect: 'none',
                         }}
                     >
                         <Box
@@ -58,6 +61,7 @@ export default function WatermarkBlock() {
                                 objectFit: "contain",
                                 mb: 3,
                                 pointerEvents: "none",
+                                userSelect: 'none',
                             }}
                         />
 

@@ -288,7 +288,7 @@ export default function SidebarProfilesButton() {
                 disableEscapeKeyDown
             >
                 <DialogContent key={dialogKey}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2, userSelect: 'none' }}>
                         <Box sx={{ flex: '0 0 30%' }}>
                             <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
                                 <Paper
@@ -300,7 +300,8 @@ export default function SidebarProfilesButton() {
                                         cursor: 'pointer',
                                         '&:hover': {
                                             backgroundColor: isAddNewSelected ? '#e3f2fd' : '#f5f5f5'
-                                        }
+                                        },
+                                        userSelect: 'none'
                                     }}
                                 >
                                     <Button
@@ -321,7 +322,8 @@ export default function SidebarProfilesButton() {
                                     border: '1px solid #e0e0e0',
                                     borderRadius: 1,
                                     p: 1,
-                                    backgroundColor: '#fafafa'
+                                    backgroundColor: '#fafafa',
+                                    userSelect: 'none'
                                 }}>
                                     <DraggableList
                                         onReorder={handleReorder}
@@ -382,7 +384,7 @@ export default function SidebarProfilesButton() {
                                 </Box>
                             </Box>
                         </Box>
-                        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                             <Box sx={{ width: '100%', p: 2 }}>
                                 <Typography variant="h6" sx={{ mb: 2 }}>
                                     {selectedProfile ? 'Edit Profile' : 'New Profile'}
@@ -394,6 +396,8 @@ export default function SidebarProfilesButton() {
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         size="small"
                                         disabled={!saveBtnEnabled}
+                                        slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                        autoComplete="off"
                                     />
                                     <Box sx={{ display: 'flex', gap: 2 }}>
                                         <TextField
@@ -404,6 +408,8 @@ export default function SidebarProfilesButton() {
                                             size="small"
                                             sx={{ flex: 1 }}
                                             disabled={!saveBtnEnabled}
+                                            slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                            autoComplete="off"
                                         />
                                         <TextField
                                             label="WPM Variation"
@@ -413,6 +419,8 @@ export default function SidebarProfilesButton() {
                                             size="small"
                                             sx={{ flex: 1 }}
                                             disabled={!saveBtnEnabled}
+                                            slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                            autoComplete="off"
                                         />
                                     </Box>
                                     <Box sx={{ display: 'flex', gap: 2 }}>
@@ -424,6 +432,8 @@ export default function SidebarProfilesButton() {
                                             size="small"
                                             sx={{ flex: 1 }}
                                             disabled={!saveBtnEnabled}
+                                            slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                            autoComplete="off"
                                         />
                                         <TextField
                                             label="Duration Variation (ms)"
@@ -433,6 +443,8 @@ export default function SidebarProfilesButton() {
                                             size="small"
                                             sx={{ flex: 1 }}
                                             disabled={!saveBtnEnabled}
+                                            slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                            autoComplete="off"
                                         />
                                     </Box>
                                     <TextField
@@ -443,6 +455,8 @@ export default function SidebarProfilesButton() {
                                         multiline
                                         rows={2}
                                         disabled={!saveBtnEnabled}
+                                        slotProps={{ input: { sx: { userSelect: 'text' } } }}
+                                        autoComplete="off"
                                     />
                                     <FormControlLabel
                                         control={
