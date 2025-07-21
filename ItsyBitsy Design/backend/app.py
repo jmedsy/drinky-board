@@ -116,10 +116,11 @@ print('Drinky Board manager started')
 #endregion
 
 # Import routes after global variables are defined to avoid circular imports
-from routes import connection_status, direct_input, output_tests, profiles
+from routes import connection_status, direct_input, output_tests, profiles, preferences
 
 # Register blueprints
 app.register_blueprint(connection_status.bp)
 app.register_blueprint(direct_input.bp)
 app.register_blueprint(output_tests.bp)
 app.register_blueprint(profiles.bp)
+app.register_blueprint(preferences.bp)
