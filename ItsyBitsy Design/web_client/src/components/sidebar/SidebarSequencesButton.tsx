@@ -418,6 +418,8 @@ export default function SidebarSequencesButton() {
                                             <MenuItem value="delay">Delay</MenuItem>
                                             <MenuItem value="keypress">Keypress</MenuItem>
                                             <MenuItem value="text">Text</MenuItem>
+                                            <MenuItem value="sequence">Sequence</MenuItem>
+                                            <MenuItem value="file">File</MenuItem>
                                         </TextField>
                                         {newAction?.type === 'delay' && (
                                             <TextField
@@ -503,6 +505,36 @@ export default function SidebarSequencesButton() {
                                         p: 1,
                                         backgroundColor: '#fafafa'
                                     }}>
+                                        <DraggableList
+                                            // onReorder={handleReorder}
+                                            items={[
+                                                <Paper key={1} sx={{ height: '36px', mb: 1, p: 1, display: 'flex', alignItems: 'center', minWidth: 0, borderLeft: '6px solid #1976d2', background: '#e3f2fd' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '70%' }}>
+                                                        Delay: 500ms
+                                                    </Typography>
+                                                </Paper>,
+                                                <Paper key={2} sx={{ height: '36px', mb: 1, p: 1, display: 'flex', alignItems: 'center', minWidth: 0, borderLeft: '6px solid #388e3c', background: '#e8f5e9' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '70%' }}>
+                                                        Keypress: A + Ctrl
+                                                    </Typography>
+                                                </Paper>,
+                                                <Paper key={3} sx={{ height: '36px', mb: 1, p: 1, display: 'flex', alignItems: 'center', minWidth: 0, borderLeft: '6px solid #f57c00', background: '#fff3e0' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '70%' }}>
+                                                        Text: &quot;Hello!&quot;
+                                                    </Typography>
+                                                </Paper>,
+                                                <Paper key={4} sx={{ height: '36px', mb: 1, p: 1, display: 'flex', alignItems: 'center', minWidth: 0, borderLeft: '6px solid #8e24aa', background: '#f3e5f5' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '70%' }}>
+                                                        Sequence: MySequence
+                                                    </Typography>
+                                                </Paper>,
+                                                <Paper key={5} sx={{ height: '36px', mb: 1, p: 1, display: 'flex', alignItems: 'center', minWidth: 0, borderLeft: '6px solid #fbc02d', background: '#fffde7' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '70%' }}>
+                                                        File: myfile.txt
+                                                    </Typography>
+                                                </Paper>
+                                            ]}
+                                        />
                                     </Box>
                                     <TextField
                                         label="Description (optional)"
