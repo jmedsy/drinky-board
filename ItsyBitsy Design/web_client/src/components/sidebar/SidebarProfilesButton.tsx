@@ -353,7 +353,14 @@ export default function SidebarProfilesButton() {
                                                     display: 'flex',
                                                     gap: 0.5
                                                 }}>
-                                                    <IconButton size="small" sx={{ p: 0.5 }} onClick={() => deleteHandler(p.filename)}>
+                                                    <IconButton
+                                                        size="small"
+                                                        sx={{ p: 0.5 }}
+                                                        onClick={(event) => {
+                                                            event?.stopPropagation();
+                                                            deleteHandler(p.filename);
+                                                        }
+                                                        }>
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>
                                                 </Box>
