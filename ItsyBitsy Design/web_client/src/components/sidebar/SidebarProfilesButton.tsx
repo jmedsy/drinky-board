@@ -209,7 +209,6 @@ export default function SidebarProfilesButton() {
                     console.error('API call failed:', err);
                 }
             }
-
             refreshProfiles();
             resetToInitialState();
         } catch (err) {
@@ -236,6 +235,7 @@ export default function SidebarProfilesButton() {
     }
 
     const refreshProfiles = async () => {
+        setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
         try {
             const res = await getAllProfiles();
             const data = await res.json();
@@ -263,7 +263,7 @@ export default function SidebarProfilesButton() {
         if (data.success) {
             console.log(data);
             setProfiles(oldProfiles);
-            setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
+            // setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
             refreshProfiles(); // Redundant, but makes absolutely sure UI is in sync
         } else {
             console.error('Error handling list reorder');
