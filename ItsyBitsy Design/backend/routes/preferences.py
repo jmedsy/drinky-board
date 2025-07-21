@@ -75,6 +75,33 @@ def update_profile_order():
             'message': str(e),
             'success': False
         }), 500
+    
+@bp.route('/update_sequence_order', methods=['PUT'])
+def update_sequence_order():
+    '''Update the order of sequences in the UI'''
+    try:
+        preferences = load_preferences()
+        sequence_order = request.get_json()
+        
+        if not isinstance(sequence_order, list):
+            return jsonify({
+                'message': 'Sequence order must be a list',
+                'success': False
+            }), 400
+        
+        preferences['sequenceOrder'] = sequence_order
+        save_preferences(preferences)
+        
+        return jsonify({
+            'message': 'Sequence order updated successfully',
+            'success': True,
+            'sequenceOrder': sequence_order
+        })
+    except Exception as e:
+        return jsonify({
+            'message': str(e),
+            'success': False
+        }), 500
 
 @bp.route('/reset', methods=['POST'])
 def reset_preferences():

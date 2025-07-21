@@ -1,42 +1,274 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import DraggableList from '../DraggableList';
 
-export default function SidebarProfilesButton() {
-    const [openDialog, setOpenDialog] = React.useState(false);
+const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BASE_URL;
 
-    // Sample items for the draggable list
-    const sampleItems = [
-        <Box key="1" sx={{ p: 2, backgroundColor: '#e3f2fd', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Action 1</Typography>
-            <Typography variant="body2">Type some text</Typography>
-        </Box>,
-        <Box key="2" sx={{ p: 2, backgroundColor: '#f3e5f5', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Action 2</Typography>
-            <Typography variant="body2">Wait 500ms</Typography>
-        </Box>,
-        <Box key="3" sx={{ p: 2, backgroundColor: '#e8f5e8', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Action 3</Typography>
-            <Typography variant="body2">Press Ctrl+C</Typography>
-        </Box>,
-        <Box key="4" sx={{ p: 2, backgroundColor: '#fff3e0', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h6">Action 4</Typography>
-            <Typography variant="body2">Type file content</Typography>
-        </Box>
-    ];
+interface SequenceInterface {
+    name: string;
+    wpm: number;
+    wpmVariation: number;
+    keyDuration: number;
+    keyDurationVariation: number;
+    description?: string;
+    created: string;
+    isActive: boolean;
+}
+
+interface Sequence {
+    filename: string;
+    data: SequenceInterface;
+}
+
+export default function SidebarSequencesButton() {
+    const [openDialog, setOpenDialog] = React.useState(false);
+    const [saveBtnEnabled, setSaveBtnEnabled] = React.useState(false);
+    const [sequences, setSequences] = React.useState<Sequence[]>([]);
+    const [selectedSequence, setSelectedSequence] = React.useState<string | null>(null);
+    const [isAddNewSelected, setIsAddNewSelected] = React.useState(false);
+    const [wasOriginallyActive, setWasOriginallyActive] = React.useState(false);
+    const [formData, setFormData] = React.useState({
+        name: '',
+        wpm: 60,
+        wpmVariation: 10,
+        keyDuration: 100,
+        keyDurationVariation: 20,
+        description: '',
+        isActive: false
+    });
+    const [dialogKey, setDialogKey] = React.useState(0);
+
+    /* API function */
+    const postSequence = async () => {
+        const sequenceData = {
+            name: formData.name,
+            wpm: formData.wpm,
+            wpmVariation: formData.wpmVariation,
+            keyDuration: formData.keyDuration,
+            keyDurationVariation: formData.keyDurationVariation,
+            description: formData.description,
+            isActive: formData.isActive
+        };
+
+        const res = await fetch(`${flaskUrl}/sequences/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sequenceData)
+        });
+
+        return res;
+    }
+
+    /* API function */
+    const putSequence = async (filename: string) => {
+        const sequenceData = {
+            name: formData.name,
+            wpm: formData.wpm,
+            wpmVariation: formData.wpmVariation,
+            keyDuration: formData.keyDuration,
+            keyDurationVariation: formData.keyDurationVariation,
+            description: formData.description,
+            isActive: formData.isActive
+        };
+
+        const res = await fetch(`${flaskUrl}/sequences/edit/${filename}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sequenceData)
+        });
+
+        return res;
+    }
+
+    /* API function */
+    const getAllSequences = async () => {
+        const res = await fetch(`${flaskUrl}/sequences/get_all`);
+        return res;
+    }
+
+    /* API function */
+    const deleteSequence = async (filename: string) => {
+        const res = await fetch(`${flaskUrl}/sequences/delete/${filename}`, {
+            method: 'DELETE'
+        });
+        return res;
+    }
+
+    /* API Function */
+    const deactivateExcept = async (filename: string) => {
+        const res = await fetch(`${flaskUrl}/sequences/deactivateExcept/${filename}`, {
+            method: 'PUT',
+        });
+        return res;
+    }
+
+    /* API function */
+    const updateSequenceOrder = async (sequencesArg: string[]) => {
+
+        const res = await fetch(`${flaskUrl}/preferences/update_sequence_order`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sequencesArg)
+        });
+        return res;
+    }
 
     const handleButtonClick = () => {
+        refreshSequences();
         setOpenDialog(true);
     }
+
+    const handleAddNewClick = () => {
+        setSaveBtnEnabled(true);
+        setSelectedSequence(null);
+        setIsAddNewSelected(true);
+        setFormData({
+            name: '',
+            wpm: 60,
+            wpmVariation: 10,
+            keyDuration: 100,
+            keyDurationVariation: 20,
+            description: '',
+            isActive: false
+        });
+    }
+
+    const handleSequenceSelect = (sequence: Sequence) => {
+        setSelectedSequence(sequence.filename);
+        setSaveBtnEnabled(true);
+        setIsAddNewSelected(false);
+        setWasOriginallyActive(sequence.data.isActive);
+        setFormData({
+            ...sequence.data,
+            description: sequence.data.description || ''
+        });
+    }
+
+    const resetToInitialState = () => {
+        setSelectedSequence(null);
+        setIsAddNewSelected(false);
+        setSaveBtnEnabled(false);
+        setWasOriginallyActive(false);
+        setFormData({
+            name: '',
+            wpm: 60,
+            wpmVariation: 10,
+            keyDuration: 100,
+            keyDurationVariation: 20,
+            description: '',
+            isActive: false
+        });
+    }
+
+    const handleSaveBtnClick = async () => {
+        setSaveBtnEnabled(false);
+
+        try {
+            const res = selectedSequence ? await putSequence(selectedSequence) : await postSequence();
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            } else {
+                console.log(`Sequence ${selectedSequence ? 'edited' : 'saved'} successfully:`, data);
+            }
+
+            // Only deactivate others if this sequence is being set as active
+            if (formData.isActive) {
+                try {
+                    const res2 = await deactivateExcept(data.filename);
+                    const data2 = await res2.json();
+
+                    if (!data2.success) {
+                        throw new Error(data2.message);
+                    } else {
+                        console.log(data2.message, data);
+                    }
+                } catch (err) {
+                    console.error('API call failed:', err);
+                }
+            }
+            refreshSequences();
+            resetToInitialState();
+        } catch (err) {
+            console.error('API call failed:', err);
+            // Re-enable save button on error
+            setSaveBtnEnabled(true);
+        }
+    }
+
+    const deleteHandler = async (filename: string) => {
+        try {
+            const res = await deleteSequence(filename);
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            } else {
+                console.log('Sequence deleted successfully:', data);
+                refreshSequences();
+            }
+        } catch (err) {
+            console.error('Delete API call failed:', err);
+        }
+    }
+
+    const refreshSequences = async () => {
+        setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
+        try {
+            const res = await getAllSequences();
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            } else {
+                const sequenceList = data.sequences.map((s: Sequence) => s);
+                setSequences(sequenceList);
+                setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
+                resetToInitialState();
+            }
+        } catch (err) {
+            console.error('API call failed:', err);
+        }
+    }
+
+    const handleReorder = async (oldIndex: number, newIndex: number) => {
+        const oldSequences = [...sequences];
+        const item = oldSequences.splice(oldIndex, 1)[0];
+        oldSequences.splice(newIndex, 0, item);
+        const res = await updateSequenceOrder(oldSequences.map(seq => seq.filename));
+        const data = await res.json();
+
+        if (data.success) {
+            console.log(data);
+            setSequences(oldSequences);
+            // setDialogKey(k => k + 1); // Force total rerender to play nice with SortableJS
+            refreshSequences(); // Redundant, but makes absolutely sure UI is in sync
+        } else {
+            console.error('Error handling list reorder');
+        }
+    };
 
     return (
         <>
@@ -55,10 +287,34 @@ export default function SidebarProfilesButton() {
                 fullWidth
                 disableEscapeKeyDown
             >
-                <DialogContent>
+                <DialogContent key={dialogKey}>
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box sx={{ flex: '0 0 30%' }}>
                             <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
+                                <Paper
+                                    sx={{
+                                        height: '60px',
+                                        mb: 1,
+                                        backgroundColor: isAddNewSelected ? '#e3f2fd' : '#fefefe',
+                                        border: isAddNewSelected ? '1px solid #2196f3' : '1px solid #e8e8e8',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            backgroundColor: isAddNewSelected ? '#e3f2fd' : '#f5f5f5'
+                                        }
+                                    }}
+                                >
+                                    <Button
+                                        variant='text'
+                                        sx={{
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: 0
+                                        }}
+                                        onClick={() => handleAddNewClick()}
+                                    >
+                                        Add New
+                                    </Button>
+                                </Paper>
                                 <Box sx={{
                                     height: '400px',
                                     overflowY: 'auto',
@@ -67,17 +323,141 @@ export default function SidebarProfilesButton() {
                                     p: 1,
                                     backgroundColor: '#fafafa'
                                 }}>
-
+                                    <DraggableList
+                                        onReorder={handleReorder}
+                                        items={sequences.map((s, index) => (
+                                            <Paper
+                                                key={index}
+                                                sx={{
+                                                    height: '60px',
+                                                    mb: 1,
+                                                    p: 2,
+                                                    backgroundColor: selectedSequence === s.filename ? '#e3f2fd' : '#fefefe',
+                                                    border: selectedSequence === s.filename ? '1px solid #2196f3' : '1px solid #e8e8e8',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    justifyContent: 'space-between',
+                                                    position: 'relative',
+                                                    cursor: 'pointer',
+                                                    userSelect: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: selectedSequence === s.filename ? '#e3f2fd' : '#f5f5f5'
+                                                    }
+                                                }}
+                                                onClick={() => handleSequenceSelect(s)}
+                                            >
+                                                <Box sx={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    display: 'flex',
+                                                    gap: 0.5
+                                                }}>
+                                                    <IconButton
+                                                        size="small"
+                                                        sx={{ p: 0.5 }}
+                                                        onClick={(event) => {
+                                                            event?.stopPropagation();
+                                                            deleteHandler(s.filename);
+                                                        }
+                                                        }>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Typography variant="body2" noWrap sx={{ fontWeight: 'bold', maxWidth: '50%' }}>
+                                                        {s.data.name}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: s.data.isActive ? 'green' : 'gray', mr: 3 }}>
+                                                        {s.data.isActive ? 'Active' : 'Inactive'}
+                                                    </Typography>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#666' }}>
+                                                    <span>WPM: {s.data.wpm}±{s.data.wpmVariation}</span>
+                                                    <span>Duration: {s.data.keyDuration}±{s.data.keyDurationVariation}ms</span>
+                                                </Box>
+                                            </Paper>
+                                        ))}
+                                    />
                                 </Box>
                             </Box>
                         </Box>
                         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                             <Box sx={{ width: '100%', p: 2 }}>
-                                <DraggableList
-                                    // height="300px"
-                                    items={sampleItems}
-                                    onReorder={(oldIdx, newIdx) => console.log(`moved item from ${oldIdx} to ${newIdx}`)}
-                                />
+                                <Typography variant="h6" sx={{ mb: 2 }}>
+                                    {selectedSequence ? 'Edit Sequence' : 'New Sequence'}
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <TextField
+                                        label="Sequence Name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        size="small"
+                                        disabled={!saveBtnEnabled}
+                                    />
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <TextField
+                                            label="WPM"
+                                            type="number"
+                                            value={formData.wpm}
+                                            onChange={(e) => setFormData({ ...formData, wpm: Number(e.target.value) })}
+                                            size="small"
+                                            sx={{ flex: 1 }}
+                                            disabled={!saveBtnEnabled}
+                                        />
+                                        <TextField
+                                            label="WPM Variation"
+                                            type="number"
+                                            value={formData.wpmVariation}
+                                            onChange={(e) => setFormData({ ...formData, wpmVariation: Number(e.target.value) })}
+                                            size="small"
+                                            sx={{ flex: 1 }}
+                                            disabled={!saveBtnEnabled}
+                                        />
+                                    </Box>
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <TextField
+                                            label="Key Duration (ms)"
+                                            type="number"
+                                            value={formData.keyDuration}
+                                            onChange={(e) => setFormData({ ...formData, keyDuration: Number(e.target.value) })}
+                                            size="small"
+                                            sx={{ flex: 1 }}
+                                            disabled={!saveBtnEnabled}
+                                        />
+                                        <TextField
+                                            label="Duration Variation (ms)"
+                                            type="number"
+                                            value={formData.keyDurationVariation}
+                                            onChange={(e) => setFormData({ ...formData, keyDurationVariation: Number(e.target.value) })}
+                                            size="small"
+                                            sx={{ flex: 1 }}
+                                            disabled={!saveBtnEnabled}
+                                        />
+                                    </Box>
+                                    <TextField
+                                        label="Description (optional)"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        size="small"
+                                        multiline
+                                        rows={2}
+                                        disabled={!saveBtnEnabled}
+                                    />
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={formData.isActive}
+                                                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                                disabled={!saveBtnEnabled || wasOriginallyActive}
+                                                sx={{
+                                                    visibility: selectedSequence && wasOriginallyActive ? 'hidden' : 'visible'
+                                                }}
+                                            />
+                                        }
+                                        label={selectedSequence && wasOriginallyActive ? "" : "Active"}
+                                    />
+                                </Box>
                             </Box>
                         </Box>
                     </Box>
@@ -85,7 +465,7 @@ export default function SidebarProfilesButton() {
                 <DialogActions>
                     <Box sx={{ flex: 1 }} />
                     <Button onClick={() => setOpenDialog(false)}>Back</Button>
-                    <Button variant='contained' color='primary'>
+                    <Button variant='contained' color='primary' disabled={!saveBtnEnabled} onClick={() => handleSaveBtnClick()}>
                         Save
                     </Button>
                 </DialogActions>

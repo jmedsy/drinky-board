@@ -16,3 +16,5 @@ dist/
 # --- BACKEND DATA ---
 **/backend/data/profiles/*
 !**/backend/data/profiles/.gitkeep
+**/backend/data/sequences/*
+!**/backend/data/sequences/.gitkeep
