@@ -1,37 +1,13 @@
 import { useGlobalKeyListener } from '@/hooks/useGlobalKeyListener';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import KeyboardIcon from '@mui/icons-material/Keyboard';
 import type { AlertColor } from '@mui/material/Alert';
-import Backdrop from '@mui/material/Backdrop';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import { keyframes } from '@mui/system';
 import * as React from 'react';
 import DrinkySnackbar from '../DrinkySnackbar';
+import { DIBackdrop, DIButton, DIDialog } from './directInput';
+import { fetchDeviceStatus, listen } from './directInput/api';
 
-const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BASE_URL;
-
-const pulse = keyframes`
-0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-}
-50% {
-    transform: scale(1.5);
-    opacity: 0.6;
-}
-`;
 
 export default function SidebarDIButton() {
+
     const [backdropOpen, setBackdropOpen] = React.useState(false);
     const [openDialog, setOpenDialog] = React.useState(false);
     const [snackbarMessage, setSnackbarMessage] = React.useState('');
@@ -41,17 +17,7 @@ export default function SidebarDIButton() {
     const sendKeyToFlask = async (code: string, data: unknown[], eventType: string = 'keydown') => {
         try {
 
-            const res = await fetch(`${flaskUrl}/direct_input/listen`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    code: code,
-                    data: data,
-                    type: eventType
-                })
-            });
+            const res = await listen(code, data, eventType);
 
             if (!res.ok) {
                 let responseData;
@@ -135,7 +101,8 @@ export default function SidebarDIButton() {
 
     const handleDIContinue = async () => {
         try {
-            const data = await fetchDeviceStatus();
+            const response = await fetchDeviceStatus();
+            const data = await response.json();
             if (data.connected) {
                 setOpenDialog(false);
                 setBackdropOpen(true);
@@ -156,77 +123,20 @@ export default function SidebarDIButton() {
         setBackdropOpen(false);
     };
 
-    const fetchDeviceStatus = async () => {
-        try {
-            const response = await fetch(`${flaskUrl}/connection_status`);
-            const data = await response.json();
-            return data;
-        } catch (err) {
-            console.error(err);
-            throw err;
-        }
-    };
-
     return (
         <>
-            <ListItemButton onClick={handleButtonClick}>
-                <ListItemIcon>
-                    <KeyboardIcon />
-                </ListItemIcon>
-                <ListItemText primary='Direct Input Mode' />
-            </ListItemButton>
+            <DIButton onClick={handleButtonClick} />
 
-            <Backdrop
-                sx={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.93)',
-                    zIndex: 9999,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                }}
+            <DIBackdrop
                 open={backdropOpen}
                 onClick={handleBackdropClick}
-            >
-                {backdropOpen && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FiberManualRecordIcon
-                            fontSize="large"
-                            color='error'
-                            sx={{ animation: `${pulse} 1s infinite` }}
-                        />
-                        <Typography variant="subtitle2" color="white" sx={{ userSelect: 'none' }}>
-                            Click anywhere to exit Direct Input mode
-                        </Typography>
-                    </Box>
-                )}
-            </Backdrop>
+            />
 
-            <Dialog
+            <DIDialog
                 open={openDialog}
                 onClose={() => setOpenDialog(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Enter Direct Input mode?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Browser will capture all keyboard activity and redirect it to the Drinky Board.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>Back</Button>
-                    <Button onClick={handleDIContinue}>
-                        Continue
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                onContinue={handleDIContinue}
+            />
 
             <DrinkySnackbar
                 open={openSnackbar}
