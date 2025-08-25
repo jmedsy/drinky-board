@@ -485,18 +485,66 @@ export default function SidebarSequencesButton() {
                                             />
                                         )}
                                         {newAction?.type === 'sequence' && (
+                                            <TextField
+                                                select
+                                                label="Sequence"
+                                                value={newAction.key || ''}
+                                                onChange={e => setNewAction({ ...newAction, key: e.target.value })}
+                                                size="small"
+                                                sx={{ minWidth: 120 }}
+                                                disabled={!saveBtnEnabled}
+                                            >
+                                                <MenuItem value=""><em>None</em></MenuItem>
+                                            </TextField>
+                                        )}
+                                        {newAction?.type === 'file' && (
                                             <>
-                                                <TextField
-                                                    select
-                                                    label="Sequence"
-                                                    value={newAction.key || ''}
-                                                    onChange={e => setNewAction({ ...newAction, key: e.target.value })}
-                                                    size="small"
-                                                    sx={{ minWidth: 120 }}
-                                                    disabled={!saveBtnEnabled}
-                                                >
-                                                    <MenuItem value=""><em>None</em></MenuItem>
-                                                </TextField>
+                                                {!newAction.filepath ? (
+                                                    <Button
+                                                        variant="text"
+                                                        component="label"
+                                                        size="small"
+                                                        sx={{
+                                                            minWidth: 120,
+                                                            height: '40px',
+                                                            border: '1px solid #e8e8e8',
+                                                            backgroundColor: '#fefefe',
+                                                            color: '#666',
+                                                            textTransform: 'none',
+                                                            alignSelf: 'center',
+                                                            marginTop: '6px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#f5f5f5'
+                                                            }
+                                                        }}
+                                                        disabled={!saveBtnEnabled}
+                                                    >
+                                                        Select File
+                                                        <input
+                                                            type="file"
+                                                            hidden
+                                                            onChange={e => {
+                                                                const file = e.target.files && e.target.files[0];
+                                                                if (file) {
+                                                                    setNewAction({ ...newAction, filepath: file.name });
+                                                                }
+                                                            }}
+                                                        />
+                                                    </Button>
+                                                ) : (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 120 }}>
+                                                        <Typography variant="body2" sx={{ mr: 1 }}>
+                                                            {newAction.filepath}
+                                                        </Typography>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => setNewAction({ ...newAction, filepath: undefined })}
+                                                            aria-label="Remove file"
+                                                        >
+                                                            <span style={{ fontWeight: 'bold', fontSize: 16 }}>&times;</span>
+                                                        </IconButton>
+                                                    </Box>
+                                                )}
                                             </>
                                         )}
                                         <IconButton
