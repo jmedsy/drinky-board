@@ -20,9 +20,17 @@ export FLASK_ENV=development
 if [ -d "../venv" ]; then
     source ../venv/bin/activate
     echo "Activated virtual environment"
+else
+    echo "Virtual environment not found. Creating one..."
+    cd ..
+    python3 -m venv venv
+    cd backend
+    source ../venv/bin/activate
+    echo "Created and activated virtual environment"
 fi
 
-pip3 install -r requirements.txt
+# Install requirements in the virtual environment
+pip install -r requirements.txt
 flask run &
 BACKEND_PID=$!
 cd ..

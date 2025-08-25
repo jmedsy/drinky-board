@@ -57,6 +57,8 @@ export default function SidebarSequencesButton() {
         key?: string;
         text?: string;
         modifiers?: string[];
+        sequence?: string;
+        filepath?: string;
     }>({ type: '' });
 
     const modifierOptions = ['Ctrl', 'Shift', 'Alt', 'Meta'];

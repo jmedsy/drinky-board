@@ -6,6 +6,7 @@
 dist/
 .vscode/
 **/__pycache__/
+**/venv/
 
 # --- NEXT.JS ---
 **/web_client/.next/
