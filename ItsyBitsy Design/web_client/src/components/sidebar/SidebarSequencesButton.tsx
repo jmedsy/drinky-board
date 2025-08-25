@@ -484,6 +484,21 @@ export default function SidebarSequencesButton() {
                                                 sx={{ minWidth: 80 }}
                                             />
                                         )}
+                                        {newAction?.type === 'sequence' && (
+                                            <>
+                                                <TextField
+                                                    select
+                                                    label="Sequence"
+                                                    value={newAction.key || ''}
+                                                    onChange={e => setNewAction({ ...newAction, key: e.target.value })}
+                                                    size="small"
+                                                    sx={{ minWidth: 120 }}
+                                                    disabled={!saveBtnEnabled}
+                                                >
+                                                    <MenuItem value=""><em>None</em></MenuItem>
+                                                </TextField>
+                                            </>
+                                        )}
                                         <IconButton
                                             size="small"
                                             color="primary"
